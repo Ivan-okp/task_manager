@@ -1,0 +1,5 @@
+.idea/
+.venv
+db_for_tasks_and_users
+db_for_tasks_and_users-shm
+db_for_tasks_and_users-wal

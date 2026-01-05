@@ -1,0 +1,147 @@
+"""
+Репозиторий операций над сущностью Task — асинхронный слой доступа к данным.
+
+В этом модуле собраны CRUD-операции для моделей Task и связанные проверки
+(наличие пользователя, валидация входных данных и т.п.). Методы реализованы
+как classmethod, принимают AsyncSession и бросают HTTPException для удобной
+интеграции с FastAPI-эндпоинтами.
+"""
+
+from typing import List
+from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.task_manager.models import TaskModel, UserModel
+from src.task_manager.schemas import (
+    TaskCreate,
+    TaskUpdate
+)
+
+
+class TaskRepository:
+    """
+    Репозиторий для работы с задачами.
+
+    Этот класс предоставляет методы для получения, добавления, обновления и удаления задач
+    в базе данных.
+    """
+
+    @classmethod
+    async def get_all(
+            cls,
+            session: AsyncSession,
+    ) -> List[TaskModel] | List:
+        """
+        Получает список всех задач из базы данных.
+
+        :param session: Асинхронная сессия.
+        :return: List[TaskModel] - Список объектов задач.
+        """
+        stmt = select(TaskModel)
+        result = await session.execute(stmt)
+        tasks = result.scalars().all()
+        return tasks
+
+    @classmethod
+    async def get_one(
+            cls,
+            task_id: int,
+            session: AsyncSession,
+    ) -> TaskModel | None:
+        """
+        Получает задачу по ее ID.
+
+        :param task_id: ID задачи.
+        :param session: Асинхронная сессия.
+        :return: TaskModel - Объект задачи, если задача найдена.
+        """
+        stmt = select(TaskModel).where(TaskModel.id == task_id)
+        result = await session.execute(stmt)
+        task = result.scalar_one_or_none()
+        if task is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Task not found"
+            )
+        return task
+
+    @classmethod
+    async def add_task(
+            cls,
+            new_task: TaskCreate,
+            session: AsyncSession,
+    ) -> TaskModel:
+        """
+        Добавляет новую задачу в базу данных.
+
+        :param new_task: Объект TaskCreate, содержащий данные для новой задачи.
+        :param session: Асинхронная сессия.
+        :return: TaskModel - Добавленный объект задачи.
+        """
+        stmt = select(UserModel).where(UserModel.id == new_task.user)
+        result = await session.execute(stmt)
+        existing_user = result.scalar_one_or_none()
+        if existing_user is None:
+            raise HTTPException(
+                status_code=404,
+                detail="User not found",
+            )
+        task_dict = new_task.dict()
+        added_task = TaskModel(**task_dict)
+        session.add(added_task)
+        await session.commit()
+        return added_task
+
+    @classmethod
+    async def update_task(
+            cls,
+            task_id: int,
+            task_for_update: TaskUpdate,
+            session: AsyncSession,
+    ) -> TaskModel | None:
+        """
+        Обновляет существующую задачу в базе данных.
+
+        :param task_id: ID задачи.
+        :param task_for_update: Объект TaskUpdate, содержащий новые данные для задачи.
+        :param session: Асинхронная сессия.
+        :return: TaskModel - Обновленный объект задачи.
+        """
+        update_data = task_for_update.model_dump(exclude_unset=True)
+        stmt = select(TaskModel).where(TaskModel.id == task_id)
+        result = await session.execute(stmt)
+        task = result.scalar_one_or_none()
+        if task is None:
+            raise HTTPException(
+                status_code=404,
+                detail="task"
+            )
+        for key, value in update_data.items():
+            setattr(task, key, value)
+        await session.commit()
+        return task
+
+    @classmethod
+    async def delete_task(
+            cls,
+            task_id: int,
+            session: AsyncSession,
+    ) -> TaskModel | None:
+        """
+        Удаляет задачу из базы данных.
+
+        :param task_id: ID задачи.
+        :param session: Асинхронная сессия.
+        :return: TaskModel - Удаленный объект задачи.
+        """
+        stmt = select(TaskModel).where(TaskModel.id == task_id)
+        result = await session.execute(stmt)
+        task_for_delete = result.scalar_one_or_none()
+        if task_for_delete is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Task not found"
+            )
+        await session.delete(task_for_delete)
+        await session.commit()
+        return task_for_delete

@@ -1,0 +1,30 @@
+[project]
+name = "task_manager"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Ivan-okp",email = "Slavinskijivan@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi (==0.118.0)",
+    "sqlalchemy[asyncio] (>=2.0.45,<3.0.0)",
+    "pyjwt (>=2.10.1,<3.0.0)",
+    "uvicorn[standard] (>=0.38.0,<0.39.0)",
+    "aiosqlite (>=0.22.0,<0.23.0)",
+    "pydantic[email] (>=2.12.5,<3.0.0)",
+    "python-multipart (>=0.0.20,<0.0.21)",
+    "pytest-asyncio (>=1.3.0,<2.0.0)"
+]
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
