@@ -20,16 +20,19 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
+from dotenv import load_dotenv
+import os
 from src.task_manager.database_core.database import get_db
 from src.task_manager.repositories import UserRepository
 from src.task_manager.schemas import DbUser
 
+load_dotenv()
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/service_user/login")
 
-# Настройки JWT
-SECRET_KEY = "my_secret"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 10
+SECRET_KEY = os.getenv("SECRET_KEY", "my_secret")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10"))
 
 
 async def encode_jwt(
@@ -118,7 +121,7 @@ async def get_current_user(
     """
     user_id: int | None = payload.get("sub")
     if user := await UserRepository.get_one(
-            user_id,
+            user_id=int(user_id),
             session=session,
     ):
         return user

@@ -1,3 +1,4 @@
+.env
 .idea/
 .venv
 db_for_tasks_and_users

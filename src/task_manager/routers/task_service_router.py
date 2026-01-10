@@ -90,8 +90,8 @@ async def get_specific_task(
     """
     if task_id:
         task = await ServiceRepository.get_task_by_id_or_title(
-            task_id=task_id,
-            user_id=user.id,
+            task_id=int(task_id),
+            user_id=int(user.id),
             session=session,
         )
         if task is None:
@@ -103,7 +103,7 @@ async def get_specific_task(
     elif task_title:
         task = await ServiceRepository.get_task_by_id_or_title(
             task_title=task_title,
-            user_id=user.id,
+            user_id=int(user.id),
             session=session,
         )
         if task is None:
@@ -186,16 +186,16 @@ async def update_task(
     """
     if task_id:
         task = await ServiceRepository.update_task(
-            user_id=user.id,
+            user_id=int(user.id),
             task_for_update=task_for_update,
-            task_id=task_id,
+            task_id=int(task_id),
             session=session,
         )
         return task
 
     if task_title:
         task = await ServiceRepository.update_task(
-            user_id=user.id,
+            user_id=int(user.id),
             task_for_update=task_for_update,
             task_title=task_title,
             session=session,
@@ -226,7 +226,7 @@ async def delete_task(
     deleted_task = await ServiceRepository.delete_task(
         task_id=task_id,
         task_title=task_title,
-        user_id=user.id,
+        user_id=int(user.id),
         session=session,
     )
     if not deleted_task:

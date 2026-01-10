@@ -171,6 +171,7 @@ class ServiceRepository:
         :return: TaskModel - Удаленный объект задачи.
         """
         if task_id:
+            task_id = int(task_id)
             stmt = select(TaskModel).where(TaskModel.user == user_id).where(TaskModel.id == task_id)
         elif task_title:
             stmt = select(TaskModel).where(TaskModel.user == user_id).where(TaskModel.title == task_title)

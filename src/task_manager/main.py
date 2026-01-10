@@ -32,7 +32,6 @@ async def lifespan(app: FastAPI):
 Что делает
 - При старте приложения открывает асинхронную транзакцию через async_engine и:
   - создаёт все таблицы, описанные в Base.metadata (эквивалент CREATE TABLE IF NOT EXISTS),
-  - устанавливает режим журналирования SQLite в WAL (выполняет PRAGMA journal_mode=WAL).
 - Передаёт управление приложению (yield) — в этот момент приложение принимает и обрабатывает запросы.
 - Не выполняет явной очистки/закрытия движка — при необходимости закрытие/уборку нужно сделать отдельно.
 
@@ -41,7 +40,6 @@ async def lifespan(app: FastAPI):
     """
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        await conn.execute(text("PRAGMA journal_mode=WAL"))
     yield
 
 
