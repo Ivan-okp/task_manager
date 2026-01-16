@@ -19,6 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.task_manager.models import UserModel
+from src.task_manager.logger_core import logger
 from tests.test_cases import (
     test_cases_user_router_for_get_user,
     test_cases_user_router_for_add_user,
@@ -28,10 +29,7 @@ from tests.test_cases import (
 
 
 @pytest.mark.asyncio
-async def test_get_users(
-        client: AsyncClient,
-        create_test_users: List[Dict]
-):
+async def test_get_users(client: AsyncClient, create_test_users: List[Dict]) -> None:
     """
     Проверяет, что GET /users возвращает список пользователей,
     и что каждый пользователь соответствует созданным тестовым пользователям.
@@ -40,18 +38,26 @@ async def test_get_users(
     :param create_test_users: Fixture для создания набора тестовых пользователей через API.
     :return: Функция не содержит return, поэтому по завершении возвращает None (неявно).
     """
+    logger.info("Starting test_get_users")
+
     response: Response = await client.get(
         "/users",
     )
+    logger.debug(f"GET /users response status code: {response.status_code}")
     assert response.status_code == 200
     users_from_api = response.json()
+    logger.debug(f"GET /users response data: {users_from_api}")
     assert len(users_from_api) == len(create_test_users)
+
+    logger.info(f"Found {len(users_from_api)} users from API")
 
     for api_user, db_user in zip(users_from_api, create_test_users):
         assert api_user["id"] == db_user["id"]
         assert api_user["name"] == db_user["name"]
         assert api_user["email"] == db_user["email"]
         assert api_user["password"] == db_user["password"]
+
+    logger.info("test_get_users completed successfully")
 
 
 @pytest.mark.asyncio
@@ -60,12 +66,12 @@ async def test_get_users(
     test_cases_user_router_for_get_user,
 )
 async def test_get_user(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        create_test_users: List[Dict],
-        user_id: int,
-        expected_status_code: int,
-        expected_result: dict | None,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    create_test_users: List[Dict],
+    user_id: int,
+    expected_status_code: int,
+    expected_result: dict | None,
 ):
     """
     Параметризованный тест для GET /users/{user_id}.
@@ -78,13 +84,20 @@ async def test_get_user(
     :param create_test_users: Fixture для создания набора тестовых пользователей через API.
     :return: Функция не содержит return, поэтому по завершении возвращает None (неявно).
     """
+    logger.info(
+        f"Starting test_get_user with user_id: {user_id}, expected_status_code: {expected_status_code}"
+    )
+
     response: Response = await client.get(
         f"/users/{user_id}",
     )
+    logger.debug(f"GET /users/{user_id} response status code: {response.status_code}")
+
     assert response.status_code == expected_status_code
 
     if expected_status_code == 200:
         response_data = response.json()
+        logger.debug(f"GET /users/{user_id} response data: {response_data}")
 
         for key, value in expected_result.items():
             assert key in response_data
@@ -95,9 +108,12 @@ async def test_get_user(
         read_user = result.scalar_one_or_none()
 
         assert read_user is not None
+        logger.debug(f"User from DB: {read_user}")
         assert read_user.name == expected_result["name"]
         assert read_user.email == expected_result["email"]
         assert read_user.password == expected_result["password"]
+
+    logger.info(f"test_get_user with user_id: {user_id} completed")
 
 
 @pytest.mark.asyncio
@@ -106,11 +122,11 @@ async def test_get_user(
     test_cases_user_router_for_add_user,
 )
 async def test_add_user(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        user_data: dict,
-        expected_status_code: int,
-        expected_result: dict | None,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    user_data: dict,
+    expected_status_code: int,
+    expected_result: dict | None,
 ):
     """
     Параметризованный тест для POST /users.
@@ -122,15 +138,23 @@ async def test_add_user(
     :param expected_result: Ожидаемый результат теста.
     :return: Функция не содержит return, поэтому по завершении возвращает None (неявно).
     """
+    logger.info(
+        f"Starting test_add_user with user_data: {user_data}, expected_status_code: {expected_status_code}"
+    )
+
     response: Response = await client.post(
         "/users",
         json=user_data,
+    )
+    logger.info(
+        f"POST /users request completed with status code: {response.status_code}"
     )
 
     assert response.status_code == expected_status_code
 
     if expected_status_code == 200:
         response_data = response.json()
+        logger.debug(f"Response data: {response_data}")
 
         for key, value in expected_result.items():
             assert key in response_data
@@ -142,6 +166,8 @@ async def test_add_user(
         created_user = result.scalar_one_or_none()
 
         assert created_user is not None
+        logger.info(f"User created successfully with ID: {user_id}")
+
         assert created_user.name == expected_result["name"]
         assert created_user.email == expected_result["email"]
         assert created_user.password == expected_result["password"]
@@ -153,13 +179,13 @@ async def test_add_user(
     test_cases_user_router_for_update_user,
 )
 async def test_update_user(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        user_id: int,
-        user_data: dict,
-        expected_status_code: int,
-        expected_result: dict | None,
-        create_test_users: List[Dict],
+    client: AsyncClient,
+    async_session: AsyncSession,
+    user_id: int,
+    user_data: dict,
+    expected_status_code: int,
+    expected_result: dict | None,
+    create_test_users: List[Dict],
 ):
     """
     Параметризованный тест для PUT /users/{user_id} (обновление задачи).
@@ -173,14 +199,23 @@ async def test_update_user(
     :param create_test_users: Fixture для создания набора тестовых пользователей через API.
     :return: Функция не содержит return, поэтому по завершении возвращает None (неявно).
     """
+    logger.info(
+        f"Starting test_update_user with user_id: {user_id}, user_data: {user_data}, expected_status_code: {expected_status_code}"
+    )
+
     response: Response = await client.put(
         f"/users/{user_id}",
         json=user_data,
     )
+    logger.info(
+        f"PUT /users/{user_id} request completed with status code: {response.status_code}"
+    )
+
     assert response.status_code == expected_status_code
 
     if expected_status_code == 200:
         response_data = response.json()
+        logger.debug(f"Response data: {response_data}")
 
         for key, value in expected_result.items():
             assert key in response_data
@@ -192,6 +227,7 @@ async def test_update_user(
         updated_task = result.scalar_one_or_none()
 
         assert updated_task is not None
+        logger.info(f"User updated successfully with ID: {user_id}")
         assert updated_task.name == expected_result["name"]
         assert updated_task.email == expected_result["email"]
         assert updated_task.password == expected_result["password"]
@@ -203,15 +239,15 @@ async def test_update_user(
     test_cases_user_router_for_delete_user,
 )
 async def test_delete_user(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        user_id: int,
-        expected_status_code: int,
-        expected_result: str | None,
-        create_test_users: List[Dict],
+    client: AsyncClient,
+    async_session: AsyncSession,
+    user_id: int,
+    expected_status_code: int,
+    expected_result: str | None,
+    create_test_users: List[Dict],
 ):
     """
-    Тестирование удаления задачи через эндпоинт DELETE /users/{user_id}.
+    Тестирование удаления пользователя через эндпоинт DELETE /users/{user_id}.
 
     :param client: Fixture, создающая TestClient с переопределенной зависимостью get_db.
     :param async_session: Fixture, предоставляющая асинхронную SQLAlchemy-сессию для теста.
@@ -221,13 +257,22 @@ async def test_delete_user(
     :param create_test_users: Fixture для создания набора тестовых пользователей через API.
     :return: Функция не содержит return, поэтому по завершении возвращает None (неявно).
     """
+    logger.info(
+        f"Starting test_delete_user with user_id: {user_id}, expected status code: {expected_status_code}"
+    )
+
     response: Response = await client.delete(
         f"/users/{user_id}",
     )
+    logger.info(
+        f"DELETE /users/{user_id} request completed with status code: {response.status_code}"
+    )
+
     assert response.status_code == expected_status_code
 
     if expected_status_code == 200:
         response_text = response.text
+        logger.debug(f"Response text: {response_text}")
 
         assert response_text == expected_result
 
@@ -236,3 +281,5 @@ async def test_delete_user(
         deleted_user = result.scalar_one_or_none()
 
         assert deleted_user is None
+
+    logger.info("Finished test_delete_user")

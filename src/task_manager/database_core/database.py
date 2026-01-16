@@ -18,6 +18,8 @@ from sqlalchemy.ext.asyncio import (
 import os
 from dotenv import load_dotenv
 
+from src.task_manager.logger_core import logger
+
 load_dotenv()
 
 
@@ -36,13 +38,24 @@ db_name = os.environ.get("POSTGRES_NAME")
 
 DATABASE_URL = f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}/{db_name}"
 
-if not db_user or not db_password or not db_host or not db_name:
+if not all([db_user, db_password, db_host, db_name]):
+    logger.warning("PostgreSQL environment variables are missing!")
+
     current_file_path = os.path.abspath(__file__)
     my_app_dir = os.path.dirname(current_file_path)
     db_path = os.path.join(my_app_dir, "db_for_tasks_and_users")
     DATABASE_URL = f"sqlite+aiosqlite:///{db_path}"
+    logger.info(f"Fallback: Using SQLite database at {db_path}")
+else:
+    DATABASE_URL = f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}/{db_name}"
+    logger.info(f"Connecting to PostgreSQL at {db_host} (DB: {db_name})")
 
-async_engine = create_async_engine(DATABASE_URL)
+try:
+    async_engine = create_async_engine(DATABASE_URL)
+    logger.info("Database engine successfully initialized")
+except Exception as e:
+    logger.critical(f"Failed to initialize database engine: {e}")
+    raise
 
 async_session_local = async_sessionmaker(
     bind=async_engine,
@@ -64,6 +77,7 @@ async def get_db() -> AsyncSession:
         Yields:
             AsyncSession: Асинхронная сессия базы данных.
     """
+    logger.debug("Creating new database session...")
     async with async_session_local() as session:
         async with session.begin():
             yield session

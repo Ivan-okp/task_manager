@@ -25,6 +25,7 @@ from src.task_manager.schemas import (
     UserCreate,
     UserUpdate
 )
+from src.task_manager.logger_core import logger
 
 router = APIRouter(
     prefix="/users",
@@ -33,33 +34,29 @@ router = APIRouter(
 
 
 @router.get(
-    "",
-    summary="Получить список всех пользователей",
-    response_model=List[DbUser]
+    "", summary="Получить список всех пользователей", response_model=List[DbUser]
 )
-async def get_users(
-        session: AsyncSession = Depends(get_db)
-) -> List[DbUser | None]:
+async def get_users(session: AsyncSession = Depends(get_db)) -> List[DbUser | None]:
     """
     Получает список всех пользователей.
 
     :param session: Асинхронная сессия.
     :return: List[DbUser] - Список объектов DbUser, представляющих пользователей.
     """
-    users = await UserRepository.get_all(
-        session=session
-    )
+    logger.info("API Request: Fetching all users.")
+
+    users = await UserRepository.get_all(session=session)
+    logger.info(f"API Response: Returning {len(users)} users.")
+
     return users
 
 
 @router.get(
-    "/{user_id}",
-    summary="Получить конкретного пользователя",
-    response_model=DbUser
+    "/{user_id}", summary="Получить конкретного пользователя", response_model=DbUser
 )
 async def get_user(
-        user_id: int,
-        session: AsyncSession = Depends(get_db),
+    user_id: int,
+    session: AsyncSession = Depends(get_db),
 ) -> DbUser:
     """
     Получает информацию о пользователе по его ID.
@@ -68,23 +65,24 @@ async def get_user(
     :param session: Асинхронная сессия.
     :return: DbUser - Объект DbUser, представляющий пользователя.
     """
-    user = await UserRepository.get_one(
-        user_id=user_id,
-        session=session
-    )
+    logger.info(f"API Request: Fetching user with ID: {user_id}.")
+
+    user = await UserRepository.get_one(user_id=user_id, session=session)
     if user:
+        logger.info(
+            f"API Response: User ID {user_id} found and returned. Username: {user.name}."
+        )
+
         return user
+
+    logger.warning(f"API Response Error: User with ID {user_id} not found.")
     raise HTTPException(status_code=404, detail="User is not exist")
 
 
-@router.post(
-    "",
-    summary="Создать нового пользователя",
-    response_model=DbUser
-)
+@router.post("", summary="Создать нового пользователя", response_model=DbUser)
 async def add_user(
-        user: UserCreate,
-        session: AsyncSession = Depends(get_db),
+    user: UserCreate,
+    session: AsyncSession = Depends(get_db),
 ) -> DbUser:
     """
     Создает нового пользователя.
@@ -93,22 +91,31 @@ async def add_user(
     :param session: Асинхронная сессия.
     :return: DbUser - Объект DbUser, представляющий созданного пользователя.
     """
+    logger.info(f"API Request: Creating new user. Username: {user.name}.")
+
     db_user = await UserRepository.add_user(
         user=user,
         session=session,
     )
-    return db_user
+    if db_user:
+        logger.info(
+            f"API Response: User successfully created. User ID: {db_user.id}, Username: {db_user.name}."
+        )
+        return db_user
+    logger.error(
+        f"API Response Error: Failed to create user with username {user.name}."
+    )
+
+    raise HTTPException(status_code=400, detail="Incorrect Data")
 
 
 @router.put(
-    "/{user_id}",
-    summary="Обновить информацию о пользователе",
-    response_model=DbUser
+    "/{user_id}", summary="Обновить информацию о пользователе", response_model=DbUser
 )
 async def update_user(
-        user_id: int,
-        user_for_update: UserUpdate,
-        session: AsyncSession = Depends(get_db),
+    user_id: int,
+    user_for_update: UserUpdate,
+    session: AsyncSession = Depends(get_db),
 ) -> DbUser:
     """
     Обновляет информацию о пользователе по его ID.
@@ -118,24 +125,25 @@ async def update_user(
     :param session: Асинхронная сессия.
     :return: DbUser - Объект DbUser, представляющий обновленного пользователя.
     """
+    logger.info(f"API Request: Updating user ID {user_id}.")
+
     user = await UserRepository.update_user(
         user_id=user_id,
         user_update=user_for_update,
         session=session,
     )
     if user:
+        logger.info(f"API Response: User ID {user_id} successfully updated.")
+
         return user
+    logger.error(f"API Response Error: Error updating user ID {user_id}.")
 
     raise HTTPException(status_code=404, detail="User is not exist")
 
 
-@router.delete(
-    "/{user_id}",
-    summary="Удалить пользователя"
-)
+@router.delete("/{user_id}", summary="Удалить пользователя")
 async def delete_user(
-        user_id: int,
-        session: AsyncSession = Depends(get_db)
+    user_id: int, session: AsyncSession = Depends(get_db)
 ) -> Response:
     """
     Удаляет пользователя по его ID.
@@ -144,11 +152,18 @@ async def delete_user(
     :param session: Асинхронная сессия.
     :return: Dict[str, str] - Словарь с сообщением об успешном удалении.
     """
+    logger.info(f"API Request: Deleting user with ID: {user_id}.")
+
     user_for_delete = await UserRepository.delete_user(
         user_id=user_id,
         session=session,
     )
     if not user_for_delete:
+        logger.warning(f"API Response Error: User ID {user_id} not found for deletion.")
+
         raise HTTPException(status_code=404, detail="User is not exists")
 
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    logger.info(f"API Response: User ID {user_id} successfully deleted.")
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT,
+    )
