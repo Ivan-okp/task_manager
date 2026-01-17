@@ -1,11 +1,5 @@
 """
 Маршруты сервиса для работы с учетной записью пользователя.
-
-Этот модуль предоставляет набор API-эндпоинтов (FastAPI APIRouter) для:
-- создания новой учетной записи (createnewuser),
-- аутентификации и выдачи JWT для работы с задачами (loginforcreatetask),
-- изменения данных текущего пользователя (changeuser),
-- удаления текущей учетной записи (deletecurrentuser).
 """
 
 from fastapi import (
@@ -16,6 +10,7 @@ from fastapi import (
     status,
     Response
 )
+from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.database_core.database import get_db
 from src.task_manager.repositories import (
@@ -32,19 +27,26 @@ from src.task_manager.security import (
     encode_jwt,
     get_current_user
 )
-from typing import Dict
 
 from src.task_manager.logger_core import logger
+from src.task_manager.models import UserModel
 
-router = APIRouter(prefix="/service_user", tags=["Сервис (работа с учетной записью)"])
+router = APIRouter(
+    prefix="/service_user",
+    tags=["Сервис (работа с учетной записью)"]
+)
 
 
-@router.post("/create_user", summary="Создание учетной записи", response_model=DbUser)
+@router.post(
+    "/create_user",
+    summary="Создание учетной записи",
+    response_model=DbUser
+)
 async def create_new_user(
     session: AsyncSession = Depends(get_db),
-    name=Form(...),
-    email=Form(...),
-    password=Form(...),
+    name: str | None = Form(...),
+    email: str | EmailStr = Form(...),
+    password: str | None = Form(...),
 ) -> DbUser:
     """
     Создать нового пользователя.
@@ -60,8 +62,15 @@ async def create_new_user(
     )
 
     if name is None or email is None or password is None:
-        raise HTTPException(status_code=422, detail="Incomplete content ")
-    new_user = UserCreate(name=name, email=email, password=password)
+        raise HTTPException(
+            status_code=422,
+            detail="Incomplete content "
+        )
+    new_user = UserCreate(
+        name=name,
+        email=email,
+        password=password
+    )
     db_user = await UserRepository.add_user(
         user=new_user,
         session=session,
@@ -74,12 +83,14 @@ async def create_new_user(
 
 
 @router.post(
-    "/login", summary="Регистрация для работы с задачами", response_model=TokenInfo
+    "/login",
+    summary="Регистрация для работы с задачами",
+    response_model=TokenInfo
 )
 async def login_for_create_task(
     session: AsyncSession = Depends(get_db),
-    username: str = Form(...),
-    password: str = Form(...),
+    username: str | None = Form(...),
+    password: str | None = Form(...),
 ) -> TokenInfo:
     """
     Выполнить аутентификацию пользователя и вернуть JWT.
@@ -97,23 +108,35 @@ async def login_for_create_task(
         session=session,
     )
     if user_for_encode is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
     jwt_payload = {"sub": str(user_for_encode.id), "username": user_for_encode.name}
-    token = await encode_jwt(jwt_payload)
+    token = await encode_jwt(
+        payload=jwt_payload
+    )
     logger.info(
         f"API Response: User '{username}' (ID: {user_for_encode.id}) successfully logged in. JWT issued."
     )
 
-    return TokenInfo(access_token=token, token_type="Bearer")
+    return TokenInfo(
+        access_token=token,
+        token_type="Bearer"
+    )
 
 
-@router.put("/change_user", summary="Изменение учетной записи", response_model=DbUser)
+@router.put(
+    "/change_user",
+    summary="Изменение учетной записи",
+    response_model=DbUser
+)
 async def change_user(
     session: AsyncSession = Depends(get_db),
-    name=Form(...),
-    email=Form(...),
-    password=Form(...),
-    user=Depends(get_current_user),
+    name: str | None = Form(...),
+    email: EmailStr | str = Form(...),
+    password: str | None = Form(...),
+    user: UserModel = Depends(get_current_user),
 ) -> DbUser:
     """
     Обновить данные текущего пользователя.
@@ -127,7 +150,11 @@ async def change_user(
     """
     logger.info(f"Received request to update user with ID: {user.id}")
 
-    user_for_change = UserUpdate(name=name, email=email, password=password)
+    user_for_change = UserUpdate(
+        name=name,
+        email=email,
+        password=password
+    )
     changed_user = await UserRepository.update_user(
         user_id=user.id,
         user_update=user_for_change,
@@ -139,11 +166,12 @@ async def change_user(
 
 
 @router.delete(
-    "/delete_user", summary="Удалить учетную запись", response_model=Dict[str, str]
+    "/delete_user",
+    summary="Удалить учетную запись",
 )
 async def delete_current_user(
     session: AsyncSession = Depends(get_db),
-    user=Depends(get_current_user),
+    user: UserModel =Depends(get_current_user),
 ) -> Response:
     """
     Удалить учетную запись текущего пользователя.
@@ -154,12 +182,19 @@ async def delete_current_user(
     """
     logger.info(f"Received request to delete user with ID: {user.id}")
 
-    user_for_delete = await UserRepository.delete_user(user_id=user.id, session=session)
+    user_for_delete = await UserRepository.delete_user(
+        user_id=user.id,
+        session=session
+    )
     if not user_for_delete:
         logger.warning(f"User with ID: {user.id} not found for deletion.")
 
-        raise HTTPException(status_code=404, detail="User is not exists")
+        raise HTTPException(
+            status_code=404,
+            detail="User is not exists"
+        )
 
     logger.info(f"Successfully deleted user with ID: {user.id}")
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT
+    )

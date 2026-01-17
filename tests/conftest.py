@@ -1,17 +1,7 @@
 """
 Фикстуры pytest для интеграционных/функциональных тестов приложения.
-
-Этот модуль содержит набор асинхронных фикстур, которые:
-- подготавливают тестовую in-memory БД и сессии;
-- перекрывают зависимость getdb в FastAPI приложении для использования тестовой сессии;
-- создают тестовые сущности (пользователи и задачи) через HTTP API приложения;
-- обеспечивают очистку созданных сущностей после тестов.
 """
 
-from typing import (
-    List,
-    Dict
-)
 from httpx import (
     Response,
     AsyncClient,
@@ -58,7 +48,7 @@ async def async_test_db() -> None:
     scope="function",
 )
 async def async_session(
-    async_test_db,
+        async_test_db: None,
 ) -> AsyncSession:
     """
      Fixture, предоставляющая асинхронную SQLAlchemy-сессию для теста.
@@ -80,8 +70,8 @@ async def async_session(
 
 @pytest.fixture(scope="function")
 async def client(
-    async_session: AsyncSession,
-):
+        async_session: AsyncSession,
+) -> AsyncClient:
     """
     Fixture, создающая TestClient с переопределенной зависимостью getdb.
 
@@ -92,14 +82,14 @@ async def client(
     """
     logger.info("Starting client fixture")
 
-    async def override_get_db():
+    async def override_get_db() -> AsyncSession:
         yield async_session
 
     app.dependency_overrides[get_db] = override_get_db
     logger.info("Overrode get_db dependency")
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
+            transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         yield ac
         logger.info("Finished client fixture, AsyncClient closed")
@@ -112,8 +102,8 @@ async def client(
     scope="function",
 )
 async def create_test_users(
-    async_session: AsyncSession, client: AsyncClient, num_users: int = 3
-) -> List[Dict]:
+        async_session: AsyncSession, client: AsyncClient, num_users: int = 3
+) -> list[dict]:
     """
     Fixture для создания набора тестовых пользователей через API.
 
@@ -166,10 +156,10 @@ async def create_test_users(
     scope="function",
 )
 async def get_user_and_jwt(
-    client: AsyncClient,
-    async_session: AsyncSession,
-    create_test_users,
-) -> Dict[str, Dict | str]:
+        client: AsyncClient,
+        async_session: AsyncSession,
+        create_test_users: list[dict],
+) -> dict[str, dict | str]:
     """
     Fixture для получения первого созданного пользователя и JWT-токена аутентификации.
 
@@ -203,11 +193,11 @@ async def get_user_and_jwt(
     scope="function",
 )
 async def create_test_tasks(
-    client: AsyncClient,
-    async_session: AsyncSession,
-    create_test_users,
-    num_tasks: int = 3,
-) -> List[Dict]:
+        client: AsyncClient,
+        async_session: AsyncSession,
+        create_test_users: list[dict],
+        num_tasks: int = 3,
+) -> list[dict]:
     """
      Fixture для создания набора тестовых задач (tasks) через API.
 
@@ -264,8 +254,8 @@ async def create_test_tasks(
 
 
 async def delete_test_task(
-    client: AsyncClient,
-    task_id: int,
+        client: AsyncClient,
+        task_id: int,
 ) -> int:
     """
     Fixture для удаления задачи.
@@ -289,8 +279,8 @@ async def delete_test_task(
 
 
 async def delete_test_user(
-    client: AsyncClient,
-    user_id: int,
+        client: AsyncClient,
+        user_id: int,
 ) -> int:
     """
     Fixture для удаления пользователя.

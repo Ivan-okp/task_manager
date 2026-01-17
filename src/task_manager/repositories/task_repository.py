@@ -1,17 +1,14 @@
 """
 Репозиторий операций над сущностью Task — асинхронный слой доступа к данным.
-
-В этом модуле собраны CRUD-операции для моделей Task и связанные проверки
-(наличие пользователя, валидация входных данных и т.п.). Методы реализованы
-как classmethod, принимают AsyncSession и бросают HTTPException для удобной
-интеграции с FastAPI-эндпоинтами.
 """
 
-from typing import List
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.task_manager.models import TaskModel, UserModel
+from src.task_manager.models import (
+    TaskModel,
+    UserModel
+)
 from src.task_manager.schemas import (
     TaskCreate,
     TaskUpdate
@@ -29,9 +26,9 @@ class TaskRepository:
 
     @classmethod
     async def get_all(
-        cls,
-        session: AsyncSession,
-    ) -> List[TaskModel] | List:
+            cls,
+            session: AsyncSession,
+    ) -> list[TaskModel] | list[None]:
         """
         Получает список всех задач из базы данных.
 
@@ -49,9 +46,9 @@ class TaskRepository:
 
     @classmethod
     async def get_one(
-        cls,
-        task_id: int,
-        session: AsyncSession,
+            cls,
+            task_id: int,
+            session: AsyncSession,
     ) -> TaskModel | None:
         """
         Получает задачу по ее ID.
@@ -68,16 +65,19 @@ class TaskRepository:
         if task is None:
             logger.warning(f"Task with ID {task_id} not found.")
 
-            raise HTTPException(status_code=404, detail="Task not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Task not found"
+            )
         logger.debug(f"Task found: {task.title}")
 
         return task
 
     @classmethod
     async def add_task(
-        cls,
-        new_task: TaskCreate,
-        session: AsyncSession,
+            cls,
+            new_task: TaskCreate,
+            session: AsyncSession,
     ) -> TaskModel:
         """
         Добавляет новую задачу в базу данных.
@@ -114,10 +114,10 @@ class TaskRepository:
 
     @classmethod
     async def update_task(
-        cls,
-        task_id: int,
-        task_for_update: TaskUpdate,
-        session: AsyncSession,
+            cls,
+            task_id: int,
+            task_for_update: TaskUpdate,
+            session: AsyncSession,
     ) -> TaskModel | None:
         """
         Обновляет существующую задачу в базе данных.
@@ -131,14 +131,20 @@ class TaskRepository:
         if not update_data:
             logger.warning(f"Update skipped for task ID {task_id}: No fields provided.")
 
-            raise HTTPException(status_code=422, detail="No data to update")
+            raise HTTPException(
+                status_code=422,
+                detail="No data to update"
+            )
         stmt = select(TaskModel).where(TaskModel.id == task_id)
         result = await session.execute(stmt)
         task = result.scalar_one_or_none()
         if task is None:
             logger.warning(f"Update failed: Task with ID {task_id} not found.")
 
-            raise HTTPException(status_code=404, detail="Task not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Task not found"
+            )
         for key, value in update_data.items():
             setattr(task, key, value)
         await session.commit()
@@ -148,9 +154,9 @@ class TaskRepository:
 
     @classmethod
     async def delete_task(
-        cls,
-        task_id: int,
-        session: AsyncSession,
+            cls,
+            task_id: int,
+            session: AsyncSession,
     ) -> TaskModel | None:
         """
         Удаляет задачу из базы данных.
@@ -167,7 +173,10 @@ class TaskRepository:
         if task_for_delete is None:
             logger.warning(f"Delete failed: Task with ID {task_id} not found.")
 
-            raise HTTPException(status_code=404, detail="Task not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Task not found"
+            )
         logger.info(
             f"Task ID {task_for_delete.id} ('{task_for_delete.title}') successfully deleted."
         )

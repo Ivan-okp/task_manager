@@ -1,17 +1,13 @@
 """
 JWT‑утилиты и зависимости FastAPI для аутентификации пользователей.
-
-Этот модуль предоставляет:
-- создание (encodejwt) и разбор (decodejwt) JWT токенов;
-- dependency gettoken — извлекает и декодирует токен из заголовка Authorization;
-- dependency getcurrentuser — получает текущего пользователя из БД по payload токена.
 """
 
 from datetime import (
     timedelta,
     datetime,
-    timezone
+    UTC
 )
+
 import jwt
 from fastapi import (
     Depends,
@@ -37,7 +33,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10")
 
 
 async def encode_jwt(
-    payload: dict,
+    payload: dict[str, str],
     algorithm: str = ALGORITHM,
     expire_timedelta: timedelta | None = None,
     expire_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -56,7 +52,7 @@ async def encode_jwt(
     logger.info(f"Creating JWT with payload: {payload.get('sub')}")
 
     to_encode = payload.copy()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if expire_timedelta:
         expire = now + expire_timedelta
     else:
@@ -71,8 +67,10 @@ async def encode_jwt(
 
 
 async def decode_jwt(
-    access_token: str | bytes, algorithm: str = ALGORITHM, secret_key: str = SECRET_KEY
-) -> dict:
+        access_token: str | bytes,
+        algorithm: str = ALGORITHM,
+        secret_key: str = SECRET_KEY
+) -> dict[str, str]:
     """
     Декодирует и верифицирует JWT.
 
@@ -91,16 +89,22 @@ async def decode_jwt(
     except jwt.ExpiredSignatureError:
         logger.warning("Token has expired")
 
-        raise HTTPException(status_code=401, detail="Token has expired")
+        raise HTTPException(
+            status_code=401,
+            detail="Token has expired"
+        )
     except InvalidTokenError as e:
         logger.error(f"Invalid token: {e}")
 
-        raise HTTPException(status_code=401, detail=f"Invalid token: {e}")
+        raise HTTPException(
+            status_code=401,
+            detail=f"Invalid token: {e}"
+        )
 
 
 async def get_token(
     token: str = Depends(oauth2_scheme),
-) -> dict:
+) -> dict[str, str | int]:
     """
     FastAPI dependency: извлекает токен из заголовка Authorization и возвращает декодированный payload.
 
@@ -119,11 +123,15 @@ async def get_token(
     except InvalidTokenError as error:
         logger.error(f"Invalid token error: {error}")
 
-        raise HTTPException(status_code=401, detail=f"invalid token error: {error}")
+        raise HTTPException(
+            status_code=401,
+            detail=f"invalid token error: {error}"
+        )
 
 
 async def get_current_user(
-    payload: dict = Depends(get_token), session: AsyncSession = Depends(get_db)
+        payload: dict = Depends(get_token),
+        session: AsyncSession = Depends(get_db)
 ) -> UserModel:
     """
     FastAPI dependency: по payload токена получает объект пользователя из репозитория.

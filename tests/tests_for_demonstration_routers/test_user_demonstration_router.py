@@ -1,14 +1,6 @@
 """
 Тесты для роутера пользователей (users).
-
-Этот модуль содержит интеграционные тесты, проверяющие поведение HTTP-эндпоинтов,
-связанных с пользователями в приложении (обновление пользователя, удаление и т.д.).
 """
-
-from typing import (
-    List,
-    Dict
-)
 
 import pytest
 from httpx import (
@@ -29,7 +21,10 @@ from tests.test_cases import (
 
 
 @pytest.mark.asyncio
-async def test_get_users(client: AsyncClient, create_test_users: List[Dict]) -> None:
+async def test_get_users(
+        client: AsyncClient,
+        create_test_users: list[dict]
+) -> None:
     """
     Проверяет, что GET /users возвращает список пользователей,
     и что каждый пользователь соответствует созданным тестовым пользователям.
@@ -66,13 +61,13 @@ async def test_get_users(client: AsyncClient, create_test_users: List[Dict]) -> 
     test_cases_user_router_for_get_user,
 )
 async def test_get_user(
-    client: AsyncClient,
-    async_session: AsyncSession,
-    create_test_users: List[Dict],
-    user_id: int,
-    expected_status_code: int,
-    expected_result: dict | None,
-):
+        client: AsyncClient,
+        async_session: AsyncSession,
+        create_test_users: list[dict],
+        user_id: int,
+        expected_status_code: int,
+        expected_result: dict | None,
+) -> None:
     """
     Параметризованный тест для GET /users/{user_id}.
 
@@ -122,12 +117,12 @@ async def test_get_user(
     test_cases_user_router_for_add_user,
 )
 async def test_add_user(
-    client: AsyncClient,
-    async_session: AsyncSession,
-    user_data: dict,
-    expected_status_code: int,
-    expected_result: dict | None,
-):
+        client: AsyncClient,
+        async_session: AsyncSession,
+        user_data: dict,
+        expected_status_code: int,
+        expected_result: dict | None,
+) -> None:
     """
     Параметризованный тест для POST /users.
 
@@ -179,14 +174,14 @@ async def test_add_user(
     test_cases_user_router_for_update_user,
 )
 async def test_update_user(
-    client: AsyncClient,
-    async_session: AsyncSession,
-    user_id: int,
-    user_data: dict,
-    expected_status_code: int,
-    expected_result: dict | None,
-    create_test_users: List[Dict],
-):
+        client: AsyncClient,
+        async_session: AsyncSession,
+        user_id: int,
+        user_data: dict,
+        expected_status_code: int,
+        expected_result: dict | None,
+        create_test_users: list[dict],
+) -> None:
     """
     Параметризованный тест для PUT /users/{user_id} (обновление задачи).
 
@@ -239,13 +234,13 @@ async def test_update_user(
     test_cases_user_router_for_delete_user,
 )
 async def test_delete_user(
-    client: AsyncClient,
-    async_session: AsyncSession,
-    user_id: int,
-    expected_status_code: int,
-    expected_result: str | None,
-    create_test_users: List[Dict],
-):
+        client: AsyncClient,
+        async_session: AsyncSession,
+        user_id: int,
+        expected_status_code: int,
+        expected_result: str | None,
+        create_test_users: list[dict],
+) -> None:
     """
     Тестирование удаления пользователя через эндпоинт DELETE /users/{user_id}.
 

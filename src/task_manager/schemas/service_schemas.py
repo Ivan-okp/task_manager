@@ -1,9 +1,5 @@
 """
 Pydantic-схемы и вспомогательные типы для сервиса аутентификации и управления задачами.
-
-Этот модуль содержит расширения и вспомогательные модели поверх базовых схем из
-src.myproject.schemas, используемые в сервисных эндпоинтах (например, для логина,
-выдачи токенов и передачи статуса задачи).
 """
 
 from enum import Enum
@@ -25,6 +21,7 @@ class UserLogin(UserBase):
     Attributes:
         email (EmailStr | None, optional): Email пользователя. Defaults to None.
     """
+
     email: EmailStr | None = None
 
 
@@ -36,6 +33,7 @@ class TokenInfo(BaseModel):
         access_token (str): Токен доступа.
         token_type (str): Тип токена (например, "Bearer").
     """
+
     access_token: str
     token_type: str
 
@@ -49,6 +47,7 @@ class TaskStatus(str, Enum):
         In_process (str): Задача в процессе выполнения.
         Finished (str): Задача завершена.
     """
+
     New = "New"
     In_process = "In_process"
     Finished = "Finished"
@@ -61,4 +60,5 @@ class TaskCreateService(TaskCreate):
     Attributes:
         status (TaskStatus): Статус задачи.  Обязательное поле.
     """
+
     status: TaskStatus = Field(...)

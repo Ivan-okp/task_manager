@@ -1,11 +1,5 @@
 """
 Pydantic‑схемы (модели) для сущности "пользователь" (User).
-
-Этот модуль содержит входные/выходные и вспомогательные модели:
-- UserBase — базовая модель пользователя с валидацией полей;
-- UserCreate — модель для создания пользователя (наследует UserBase);
-- UserUpdate — модель для частичного обновления пользователя;
-- DbUser — модель представления пользователя, возвращаемая из БД (ответ).
 """
 
 from pydantic import (
@@ -27,11 +21,12 @@ class UserBase(BaseModel):
 
     model_config = ConfigDict(extra='forbid') - Запрещает передачу дополнительных полей, не определенных в модели.
     """
+
     name: str = Field(..., min_length=2, max_length=20)
     email: EmailStr = Field(...)
     password: str = Field(..., min_length=8)
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra="forbid")
 
 
 class UserCreate(UserBase):
@@ -40,6 +35,7 @@ class UserCreate(UserBase):
 
     Наследуется от UserBase, поэтому содержит те же поля и валидации.
     """
+
     pass
 
 
@@ -53,6 +49,7 @@ class UserUpdate(UserBase):
         password (str, optional): Новый пароль пользователя. Длина не менее 8 символов. Если не указан, пароль
         не изменяется.
     """
+
     name: str = Field(default=None, min_length=2, max_length=20)
     email: EmailStr = Field(default=None)
     password: str = Field(default=None, min_length=8)
@@ -68,6 +65,7 @@ class DbUser(UserBase):
     class Config:
         from_attributes = True - Позволяет создавать объекты DbUser из объектов, имеющих атрибуты с такими же именами.
     """
+
     id: int
 
     class Config:

@@ -1,15 +1,7 @@
 """
 API-маршруты для управления пользователями.
-
-Этот модуль содержит FastAPI APIRouter с CRUD-эндпоинтами для сущности User.
-Каждый эндпоинт использует асинхронную сессию SQLAlchemy через Depends(getdb)
-и делегирует операции над данными в слой репозиториев (UserRepository).
 """
 
-from typing import (
-    List,
-    Dict
-)
 from fastapi import (
     APIRouter,
     HTTPException,
@@ -34,9 +26,13 @@ router = APIRouter(
 
 
 @router.get(
-    "", summary="Получить список всех пользователей", response_model=List[DbUser]
+    "",
+    summary="Получить список всех пользователей",
+    response_model=list[DbUser]
 )
-async def get_users(session: AsyncSession = Depends(get_db)) -> List[DbUser | None]:
+async def get_users(
+        session: AsyncSession = Depends(get_db)
+) -> list[DbUser] | list[None]:
     """
     Получает список всех пользователей.
 
@@ -45,14 +41,18 @@ async def get_users(session: AsyncSession = Depends(get_db)) -> List[DbUser | No
     """
     logger.info("API Request: Fetching all users.")
 
-    users = await UserRepository.get_all(session=session)
+    users = await UserRepository.get_all(
+        session=session
+    )
     logger.info(f"API Response: Returning {len(users)} users.")
 
     return users
 
 
 @router.get(
-    "/{user_id}", summary="Получить конкретного пользователя", response_model=DbUser
+    "/{user_id}",
+    summary="Получить конкретного пользователя",
+    response_model=DbUser
 )
 async def get_user(
     user_id: int,
@@ -67,7 +67,10 @@ async def get_user(
     """
     logger.info(f"API Request: Fetching user with ID: {user_id}.")
 
-    user = await UserRepository.get_one(user_id=user_id, session=session)
+    user = await UserRepository.get_one(
+        user_id=user_id,
+        session=session
+    )
     if user:
         logger.info(
             f"API Response: User ID {user_id} found and returned. Username: {user.name}."
@@ -76,10 +79,17 @@ async def get_user(
         return user
 
     logger.warning(f"API Response Error: User with ID {user_id} not found.")
-    raise HTTPException(status_code=404, detail="User is not exist")
+    raise HTTPException(
+        status_code=404,
+        detail="User is not exist"
+    )
 
 
-@router.post("", summary="Создать нового пользователя", response_model=DbUser)
+@router.post(
+    "",
+    summary="Создать нового пользователя",
+    response_model=DbUser
+)
 async def add_user(
     user: UserCreate,
     session: AsyncSession = Depends(get_db),
@@ -106,11 +116,16 @@ async def add_user(
         f"API Response Error: Failed to create user with username {user.name}."
     )
 
-    raise HTTPException(status_code=400, detail="Incorrect Data")
+    raise HTTPException(
+        status_code=400,
+        detail="Incorrect Data"
+    )
 
 
 @router.put(
-    "/{user_id}", summary="Обновить информацию о пользователе", response_model=DbUser
+    "/{user_id}",
+    summary="Обновить информацию о пользователе",
+    response_model=DbUser
 )
 async def update_user(
     user_id: int,
@@ -138,12 +153,19 @@ async def update_user(
         return user
     logger.error(f"API Response Error: Error updating user ID {user_id}.")
 
-    raise HTTPException(status_code=404, detail="User is not exist")
+    raise HTTPException(
+        status_code=404,
+        detail="User is not exist"
+    )
 
 
-@router.delete("/{user_id}", summary="Удалить пользователя")
+@router.delete(
+    "/{user_id}",
+    summary="Удалить пользователя",
+)
 async def delete_user(
-    user_id: int, session: AsyncSession = Depends(get_db)
+        user_id: int,
+        session: AsyncSession = Depends(get_db)
 ) -> Response:
     """
     Удаляет пользователя по его ID.
@@ -161,7 +183,10 @@ async def delete_user(
     if not user_for_delete:
         logger.warning(f"API Response Error: User ID {user_id} not found for deletion.")
 
-        raise HTTPException(status_code=404, detail="User is not exists")
+        raise HTTPException(
+            status_code=404,
+            detail="User is not exists"
+        )
 
     logger.info(f"API Response: User ID {user_id} successfully deleted.")
     return Response(
