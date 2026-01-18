@@ -3,10 +3,7 @@
 """
 
 import pytest
-from httpx import (
-    AsyncClient,
-    Response
-)
+from httpx import AsyncClient, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,14 +14,14 @@ from tests.test_cases import (
     test_cases_task_router_for_get_task,
     test_cases_task_router_for_add_task,
     test_cases_task_router_for_update_task,
-    test_cases_task_router_for_delete_task
+    test_cases_task_router_for_delete_task,
 )
 
 
 @pytest.mark.asyncio
 async def test_get_tasks(
-        client: AsyncClient,
-        create_test_tasks: list[dict],
+    client: AsyncClient,
+    create_test_tasks: list[dict],
 ) -> None:
     """
     Проверяет, что GET /tasks возвращает список задач,
@@ -65,12 +62,12 @@ async def test_get_tasks(
     test_cases_task_router_for_get_task,
 )
 async def test_get_task(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        task_id: int,
-        expected_status_code: int,
-        expected_result: dict | None,
-        create_test_tasks: list[dict],
+    client: AsyncClient,
+    async_session: AsyncSession,
+    task_id: int,
+    expected_status_code: int,
+    expected_result: dict | None,
+    create_test_tasks: list[dict],
 ) -> None:
     """
     Параметризованный тест для GET /tasks/{task_id}.
@@ -111,12 +108,12 @@ async def test_get_task(
     test_cases_task_router_for_add_task,
 )
 async def test_add_task(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        task_data: dict,
-        expected_status_code: int,
-        expected_result: dict | None,
-        create_test_users: list[dict],
+    client: AsyncClient,
+    async_session: AsyncSession,
+    task_data: dict,
+    expected_status_code: int,
+    expected_result: dict | None,
+    create_test_users: list[dict],
 ) -> None:
     """
     Параметризованный тест для POST /tasks.
@@ -178,14 +175,14 @@ async def test_add_task(
     test_cases_task_router_for_update_task,
 )
 async def test_task_update(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        create_test_tasks: list[dict],
-        task_index: int,
-        task_id: int,
-        task_data: dict,
-        expected_status_code: int,
-        expected_result: dict | None,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    create_test_tasks: list[dict],
+    task_index: int,
+    task_id: int,
+    task_data: dict,
+    expected_status_code: int,
+    expected_result: dict | None,
 ) -> None:
     """
     Параметризованный тест для PUT /tasks/{task_id} (обновление задачи).
@@ -247,13 +244,13 @@ async def test_task_update(
     test_cases_task_router_for_delete_task,
 )
 async def test_task_delete(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        create_test_tasks: list[dict],
-        task_index: int,
-        task_id: int,
-        expected_status_code: int,
-        expected_result: str | None,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    create_test_tasks: list[dict],
+    task_index: int,
+    task_id: int,
+    expected_status_code: int,
+    expected_result: str | None,
 ) -> None:
     """
     Тестирование удаления задачи через эндпоинт DELETE /tasks/{task_id}.

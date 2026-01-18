@@ -11,10 +11,7 @@ current_file = Path(__file__).resolve()
 src_dir = current_file.parent.parent
 log_dir = src_dir / "logs"
 
-log_dir.mkdir(
-    parents=True,
-    exist_ok=True
-)
+log_dir.mkdir(parents=True, exist_ok=True)
 
 log_file_path = log_dir / "app.log"
 

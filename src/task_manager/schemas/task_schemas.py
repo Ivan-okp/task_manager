@@ -3,11 +3,7 @@ Pydantic-схемы (модели) для объектов "задача" (Task)
 """
 
 from typing import Literal
-from pydantic import (
-    BaseModel,
-    Field,
-    ConfigDict
-)
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class TaskBase(BaseModel):

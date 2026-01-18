@@ -2,24 +2,9 @@
 Модуль-пакет экспорта Pydantic‑схем (aggregate exports).
 """
 
-from .task_schemas import (
-    TaskBase,
-    TaskCreate,
-    TaskUpdate,
-    DbTask
-)
-from .user_schemas import (
-    UserBase,
-    UserCreate,
-    UserUpdate,
-    DbUser
-)
-from .service_schemas import (
-    UserLogin,
-    TokenInfo,
-    TaskStatus,
-    TaskCreateService
-)
+from .task_schemas import TaskBase, TaskCreate, TaskUpdate, DbTask
+from .user_schemas import UserBase, UserCreate, UserUpdate, DbUser
+from .service_schemas import UserLogin, TokenInfo, TaskStatus, TaskCreateService
 
 __all__ = [
     "DbTask",

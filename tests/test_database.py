@@ -3,21 +3,14 @@
 """
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import (
-    create_async_engine,
-    AsyncSession,
-    async_sessionmaker
-)
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from src.task_manager.database_core import Base
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 test_engine = create_async_engine(TEST_DATABASE_URL)
 
 test_session_local = async_sessionmaker(
-    bind=test_engine,
-    autoflush=False,
-    expire_on_commit=False,
-    class_=AsyncSession
+    bind=test_engine, autoflush=False, expire_on_commit=False, class_=AsyncSession
 )
 
 
@@ -29,8 +22,7 @@ async def create_test_tables() -> None:
     """
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        await conn.execute(
-            text("PRAGMA journal_mode=WAL"))
+        await conn.execute(text("PRAGMA journal_mode=WAL"))
         print("Test tables created.")
 
 

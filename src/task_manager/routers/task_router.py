@@ -2,21 +2,11 @@
 API-маршруты для работы с задачами (Task).
 """
 
-from fastapi import (
-    APIRouter,
-    HTTPException,
-    Depends,
-    Response,
-    status
-)
+from fastapi import APIRouter, HTTPException, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.database_core.database import get_db
 from src.task_manager.repositories import TaskRepository
-from src.task_manager.schemas import (
-    DbTask,
-    TaskCreate,
-    TaskUpdate
-)
+from src.task_manager.schemas import DbTask, TaskCreate, TaskUpdate
 from src.task_manager.logger_core import logger
 
 router = APIRouter(
@@ -25,13 +15,9 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "",
-    summary="Получить список всех задач",
-    response_model=list[DbTask]
-)
+@router.get("", summary="Получить список всех задач", response_model=list[DbTask])
 async def get_tasks(
-        session: AsyncSession = Depends(get_db)
+    session: AsyncSession = Depends(get_db),
 ) -> list[DbTask] | list[None]:
     """
     Получает список всех задач.
@@ -54,10 +40,7 @@ async def get_tasks(
     summary="Получить информацию о конкретной задаче",
     response_model=DbTask,
 )
-async def get_task(
-        task_id: int,
-        session: AsyncSession = Depends(get_db)
-) -> DbTask:
+async def get_task(task_id: int, session: AsyncSession = Depends(get_db)) -> DbTask:
     """
     Получает информацию о задаче по ее ID.
 
@@ -67,30 +50,20 @@ async def get_task(
     """
     logger.info(f"API Request: Fetching task with ID: {task_id}")
 
-    task = await TaskRepository.get_one(
-        task_id=task_id,
-        session=session
-    )
+    task = await TaskRepository.get_one(task_id=task_id, session=session)
     if task:
         logger.info(f"API Response: Task ID {task_id} found and returned.")
 
         return task
     logger.warning(f"API Response (Error): Task ID {task_id} not found.")
 
-    raise HTTPException(
-        status_code=404,
-        detail="Task is not exist"
-    )
+    raise HTTPException(status_code=404, detail="Task is not exist")
 
 
-@router.post(
-    "",
-    summary="Создать новую задачу",
-    response_model=DbTask
-)
+@router.post("", summary="Создать новую задачу", response_model=DbTask)
 async def add_task(
-        task: TaskCreate,
-        session: AsyncSession = Depends(get_db),
+    task: TaskCreate,
+    session: AsyncSession = Depends(get_db),
 ) -> DbTask:
     """
     Создает новую задачу.
@@ -112,10 +85,7 @@ async def add_task(
             f"API Response Error: Failed to create task for user ID {task.user}. TaskRepository returned None."
         )
 
-        raise HTTPException(
-            status_code=400,
-            detail="Incorrect request"
-        )
+        raise HTTPException(status_code=400, detail="Incorrect request")
     logger.info(
         f"API Response: Task created successfully. Task ID: {db_task.id}, Title: '{db_task.title}'."
     )
@@ -123,15 +93,9 @@ async def add_task(
     return db_task
 
 
-@router.put(
-    "/{task_id}",
-    summary="Обновить информацию о задаче",
-    response_model=DbTask
-)
+@router.put("/{task_id}", summary="Обновить информацию о задаче", response_model=DbTask)
 async def update_task(
-        task_id: int,
-        task_for_update: TaskUpdate,
-        session: AsyncSession = Depends(get_db)
+    task_id: int, task_for_update: TaskUpdate, session: AsyncSession = Depends(get_db)
 ) -> DbTask:
     """
     Обновляет информацию о задаче по ее ID.
@@ -154,10 +118,7 @@ async def update_task(
         return task
 
     logger.error(f"API Response Error: Failed to update task ID {task_id}.")
-    raise HTTPException(
-        status_code=404,
-        detail="Task is not exist"
-    )
+    raise HTTPException(status_code=404, detail="Task is not exist")
 
 
 @router.delete(
@@ -165,8 +126,8 @@ async def update_task(
     summary="Удалить задачу",
 )
 async def delete_task(
-        task_id: int,
-        session: AsyncSession = Depends(get_db),
+    task_id: int,
+    session: AsyncSession = Depends(get_db),
 ) -> Response:
     """
     Удаляет задачу по ее ID.
@@ -183,12 +144,7 @@ async def delete_task(
     )
     if not task_for_delete:
         logger.error(f"API Response Error: Failed to delete task ID {task_id}.")
-        raise HTTPException(
-            status_code=404,
-            detail="Task is not exists"
-        )
+        raise HTTPException(status_code=404, detail="Task is not exists")
 
     logger.info(f"API Response: Task ID {task_id} successfully deleted.")
-    return Response(
-        status_code=status.HTTP_204_NO_CONTENT
-    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -6,11 +6,7 @@ from .task_repository import TaskRepository
 from .user_repository import UserRepository
 from .service_repository import ServiceRepository
 
-__all__ = [
-    "ServiceRepository",
-    "TaskRepository",
-    "UserRepository"
-]
+__all__ = ["ServiceRepository", "TaskRepository", "UserRepository"]
 
 """
 Список всех публичных объектов, экспортируемых из этого модуля.

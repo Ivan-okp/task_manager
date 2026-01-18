@@ -5,10 +5,7 @@
 from .user_models import UserModel
 from .task_models import TaskModel
 
-__all__ = [
-    "TaskModel",
-    "UserModel"
-]
+__all__ = ["TaskModel", "UserModel"]
 
 """
 Список всех публичных объектов, экспортируемых из этого модуля.

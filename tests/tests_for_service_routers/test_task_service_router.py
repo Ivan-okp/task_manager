@@ -3,10 +3,7 @@
 """
 
 import pytest
-from httpx import (
-    AsyncClient,
-    Response
-)
+from httpx import AsyncClient, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,7 +15,7 @@ from tests.test_cases import (
     test_cases_service_task_router_for_get_specific_task,
     test_cases_service_task_router_for_create_task,
     test_cases_service_task_router_for_update_task,
-    test_cases_service_task_router_for_delete_task
+    test_cases_service_task_router_for_delete_task,
 )
 
 
@@ -28,13 +25,13 @@ from tests.test_cases import (
     test_cases_service_task_router_for_get_task,
 )
 async def test_get_all_tasks(
-        client: AsyncClient,
-        get_user_and_jwt: dict,
-        task_case: int,
-        token: dict,
-        expected_status_code: int,
-        expected_result: dict | None,
-        create_test_tasks: list[dict],
+    client: AsyncClient,
+    get_user_and_jwt: dict,
+    task_case: int,
+    token: dict,
+    expected_status_code: int,
+    expected_result: dict | None,
+    create_test_tasks: list[dict],
 ) -> None:
     """
     Проверяет, что GET /tasks возвращает список задач конкретного пользователя,
@@ -89,15 +86,15 @@ async def test_get_all_tasks(
     test_cases_service_task_router_for_get_specific_task,
 )
 async def test_get_specific_task(
-        client: AsyncClient,
-        get_user_and_jwt: dict,
-        task_case: int,
-        token: dict,
-        task_id: int,
-        task_title: str,
-        expected_status_code: int,
-        expected_result: dict | None,
-        create_test_tasks: list[dict],
+    client: AsyncClient,
+    get_user_and_jwt: dict,
+    task_case: int,
+    token: dict,
+    task_id: int,
+    task_title: str,
+    expected_status_code: int,
+    expected_result: dict | None,
+    create_test_tasks: list[dict],
 ) -> None:
     """
     Тест для /service/get_specific_task — проверяет поиск задачи конкретного пользователя по id и по title.
@@ -170,14 +167,14 @@ async def test_get_specific_task(
     test_cases_service_task_router_for_create_task,
 )
 async def test_create_task(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        get_user_and_jwt: dict[str, dict | str],
-        task_case: int,
-        token: dict,
-        task_data: dict,
-        expected_status_code: int,
-        expected_result: dict,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    get_user_and_jwt: dict[str, dict | str],
+    task_case: int,
+    token: dict,
+    task_data: dict,
+    expected_status_code: int,
+    expected_result: dict,
 ) -> None:
     """
     Тест для /service/create_task — создание задачи от имени аутентифицированного пользователя.
@@ -245,18 +242,18 @@ async def test_create_task(
     test_cases_service_task_router_for_update_task,
 )
 async def test_update_task(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        create_test_tasks: list[dict],
-        get_user_and_jwt: dict,
-        task_case: int,
-        task_case_2: int,
-        token: dict,
-        task_data: dict,
-        task_id: int,
-        task_title: str,
-        expected_status_code: int,
-        expected_result: dict | None,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    create_test_tasks: list[dict],
+    get_user_and_jwt: dict,
+    task_case: int,
+    task_case_2: int,
+    token: dict,
+    task_data: dict,
+    task_id: int,
+    task_title: str,
+    expected_status_code: int,
+    expected_result: dict | None,
 ) -> None:
     """
     Тест для /service/update_task — изменение задачи от имени аутентифицированного пользователя.
@@ -365,18 +362,18 @@ async def test_update_task(
     test_cases_service_task_router_for_delete_task,
 )
 async def test_delete_task(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        get_user_and_jwt: dict,
-        create_test_tasks: list[dict],
-        task_case: int,
-        task_case_2: int,
-        token: dict,
-        task_id: int,
-        task_title: str,
-        expected_status_code: int,
-        expected_result: dict,
-        expected_result_2: dict,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    get_user_and_jwt: dict,
+    create_test_tasks: list[dict],
+    task_case: int,
+    task_case_2: int,
+    token: dict,
+    task_id: int,
+    task_title: str,
+    expected_status_code: int,
+    expected_result: dict,
+    expected_result_2: dict,
 ) -> None:
     """
     Интеграционный тест для /service/deletetask, проверяющий удаление задач, принадлежащих конкретному пользователю,

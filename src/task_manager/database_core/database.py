@@ -52,10 +52,7 @@ except Exception as e:
     raise
 
 async_session_local = async_sessionmaker(
-    bind=async_engine,
-    autoflush=False,
-    expire_on_commit=False,
-    class_=AsyncSession
+    bind=async_engine, autoflush=False, expire_on_commit=False, class_=AsyncSession
 )
 
 

@@ -2,17 +2,10 @@
 JWT‑утилиты и зависимости FastAPI для аутентификации пользователей.
 """
 
-from datetime import (
-    timedelta,
-    datetime,
-    UTC
-)
+from datetime import timedelta, datetime, UTC
 
 import jwt
-from fastapi import (
-    Depends,
-    HTTPException
-)
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -67,9 +60,7 @@ async def encode_jwt(
 
 
 async def decode_jwt(
-        access_token: str | bytes,
-        algorithm: str = ALGORITHM,
-        secret_key: str = SECRET_KEY
+    access_token: str | bytes, algorithm: str = ALGORITHM, secret_key: str = SECRET_KEY
 ) -> dict[str, str]:
     """
     Декодирует и верифицирует JWT.
@@ -89,17 +80,11 @@ async def decode_jwt(
     except jwt.ExpiredSignatureError:
         logger.warning("Token has expired")
 
-        raise HTTPException(
-            status_code=401,
-            detail="Token has expired"
-        )
+        raise HTTPException(status_code=401, detail="Token has expired")
     except InvalidTokenError as e:
         logger.error(f"Invalid token: {e}")
 
-        raise HTTPException(
-            status_code=401,
-            detail=f"Invalid token: {e}"
-        )
+        raise HTTPException(status_code=401, detail=f"Invalid token: {e}")
 
 
 async def get_token(
@@ -123,15 +108,11 @@ async def get_token(
     except InvalidTokenError as error:
         logger.error(f"Invalid token error: {error}")
 
-        raise HTTPException(
-            status_code=401,
-            detail=f"invalid token error: {error}"
-        )
+        raise HTTPException(status_code=401, detail=f"invalid token error: {error}")
 
 
 async def get_current_user(
-        payload: dict = Depends(get_token),
-        session: AsyncSession = Depends(get_db)
+    payload: dict = Depends(get_token), session: AsyncSession = Depends(get_db)
 ) -> UserModel:
     """
     FastAPI dependency: по payload токена получает объект пользователя из репозитория.

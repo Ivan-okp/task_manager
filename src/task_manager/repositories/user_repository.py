@@ -6,10 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.models import UserModel
-from src.task_manager.schemas import (
-    UserCreate,
-    UserUpdate
-)
+from src.task_manager.schemas import UserCreate, UserUpdate
 from src.task_manager.logger_core import logger
 
 
@@ -62,10 +59,7 @@ class UserRepository:
         if user is None:
             logger.warning(f"User with ID {user_id} not found.")
 
-            raise HTTPException(
-                status_code=404,
-                detail="User not found"
-            )
+            raise HTTPException(status_code=404, detail="User not found")
         logger.debug(f"User found: {user.name}")
 
         return user
@@ -114,10 +108,7 @@ class UserRepository:
         if not update_data:
             logger.warning(f"Update skipped for user ID {user_id}: No fields provided.")
 
-            raise HTTPException(
-                status_code=422,
-                detail="No fields to update"
-            )
+            raise HTTPException(status_code=422, detail="No fields to update")
         logger.info(f"Attempting to update user ID {user_id}.")
 
         stmt = select(UserModel).where(UserModel.id == user_id)
@@ -159,10 +150,7 @@ class UserRepository:
         if user_for_delete is None:
             logger.warning(f"Delete failed: User with ID {user_id} not found.")
 
-            raise HTTPException(
-                status_code=404,
-                detail="User not found"
-            )
+            raise HTTPException(status_code=404, detail="User not found")
         await session.delete(user_for_delete)
         await session.commit()
         logger.info(f"Deletion committed for user ID {user_id}.")

@@ -6,7 +6,12 @@ test_cases_service_user_router_for_create_new_user = [
     (
         {"name": "test user", "email": "test@mail.com", "password": "123456789"},
         200,
-        {"name": "test user", "email": "test@mail.com", "password": "123456789", "id": 1},
+        {
+            "name": "test user",
+            "email": "test@mail.com",
+            "password": "123456789",
+            "id": 1,
+        },
     ),
     (
         {"email": "test@mail.com", "password": "123456789"},
@@ -26,30 +31,35 @@ test_cases_service_user_router_for_create_new_user = [
 ]
 
 test_cases_service_user_router_for_login_user = [
-    (
-        0,
-        200,
-        {"token_value": "access_token", "token_type": "Bearer"}
-    ),
-    (
-        4,
-        404,
-        None
-    ),
+    (0, 200, {"token_value": "access_token", "token_type": "Bearer"}),
+    (4, 404, None),
 ]
 
 test_cases_service_user_router_for_change_user = [
     (
         0,
         {"token": "00000000"},
-        {"name": "Test update user", "email": "test@update.com", "password": "987654321"},
+        {
+            "name": "Test update user",
+            "email": "test@update.com",
+            "password": "987654321",
+        },
         200,
-        {"name": "Test update user", "email": "test@update.com", "password": "987654321", "id": 1, },
+        {
+            "name": "Test update user",
+            "email": "test@update.com",
+            "password": "987654321",
+            "id": 1,
+        },
     ),
     (
         1,
         {"token": "00000000"},
-        {"name": "Test update user", "email": "test@update.com", "password": "987654321"},
+        {
+            "name": "Test update user",
+            "email": "test@update.com",
+            "password": "987654321",
+        },
         401,
         None,
     ),

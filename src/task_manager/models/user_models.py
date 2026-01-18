@@ -2,11 +2,7 @@
 Модуль модели пользователя (UserModel) для SQLAlchemy.
 """
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    String
-)
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from src.task_manager.database_core.database import Base
 

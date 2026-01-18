@@ -2,12 +2,7 @@
 Pydantic‑схемы (модели) для сущности "пользователь" (User).
 """
 
-from pydantic import (
-    BaseModel,
-    Field,
-    EmailStr,
-    ConfigDict
-)
+from pydantic import BaseModel, Field, EmailStr, ConfigDict
 
 
 class UserBase(BaseModel):

@@ -3,9 +3,9 @@ name = "task_manager"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Ivan-okp",email = "Slavinskijivan@gmail.com"}
+    { name = "Ivan-okp", email = "Slavinskijivan@gmail.com" }
 ]
-license = {text = "MIT"}
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -26,7 +26,8 @@ dependencies = [
 dev = [
     "pytest (>=9.0.2,<10.0.0)",
     "pytest-asyncio (>=1.3.0,<2.0.0)",
-    "ruff (>=0.14.13,<0.15.0)"
+    "ruff (>=0.14.13,<0.15.0)",
+    "pre-commit (>=4.5.1,<5.0.0)"
 ]
 
 
@@ -35,14 +36,12 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-#fix = true
 
 exclude = [
     ".venv",
     ".git",
     ".gitignore",
     "__pycache__",
-#    "tests",
 ]
 
 select = [
@@ -63,10 +62,14 @@ ignore = [
     "RUF001",
     "RUF002",
     "B905",
+    "ANN101",
+    "ANN102",
+    "ANN204",
+    "ANN401",
 ]
 
 line-length = 88
-target-version = "py313"
+target-version = "py310"
 
 [tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true

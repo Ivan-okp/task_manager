@@ -3,15 +3,8 @@ Pydantic-схемы и вспомогательные типы для серви
 """
 
 from enum import Enum
-from pydantic import (
-    EmailStr,
-    BaseModel,
-    Field
-)
-from src.task_manager.schemas import (
-    UserBase,
-    TaskCreate
-)
+from pydantic import EmailStr, BaseModel, Field
+from src.task_manager.schemas import UserBase, TaskCreate
 
 
 class UserLogin(UserBase):

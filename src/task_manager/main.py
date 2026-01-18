@@ -21,9 +21,7 @@ from src.task_manager.logger_core import logger
 
 
 @asynccontextmanager
-async def lifespan(
-        app: FastAPI
-) -> AsyncGenerator:
+async def lifespan(app: FastAPI) -> AsyncGenerator:
     """
         Контекстный менеджер жизненного цикла приложения FastAPI, выполняющий инициализацию базы данных при старте приложения.
 

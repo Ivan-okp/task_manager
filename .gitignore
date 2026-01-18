@@ -1,6 +1,33 @@
-.env
+### PyCharm ###
 .idea/
-.venv
+*.iws
+*.iml
+*.ipr
+!.idea/runConfigurations/
+
+### Python ###
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+build/
+dist/
+
+### Инструменты (Ruff, Pytest, MyPy) ###
+.ruff_cache/
+.pytest_cache/
+.coverage
+.cache
+htmlcov/
+
+### Секреты и Логи ###
+.env
+*.log
+src/task_manager/logs/
+
+### База данных SQLite ###
 db_for_tasks_and_users
 db_for_tasks_and_users-shm
 db_for_tasks_and_users-wal

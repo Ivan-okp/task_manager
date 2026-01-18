@@ -3,10 +3,7 @@
 """
 
 import pytest
-from httpx import (
-    AsyncClient,
-    Response
-)
+from httpx import AsyncClient, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +14,7 @@ from tests.test_cases import (
     test_cases_service_user_router_for_create_new_user,
     test_cases_service_user_router_for_login_user,
     test_cases_service_user_router_for_change_user,
-    test_cases_service_user_router_for_delete_user
+    test_cases_service_user_router_for_delete_user,
 )
 
 
@@ -27,11 +24,11 @@ from tests.test_cases import (
     test_cases_service_user_router_for_create_new_user,
 )
 async def test_create_new_user(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        user_data: dict,
-        expected_status_code: int,
-        expected_result: dict | None,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    user_data: dict,
+    expected_status_code: int,
+    expected_result: dict | None,
 ) -> None:
     """
     Тест создания нового пользователя через /service_user/create_user.
@@ -89,12 +86,12 @@ async def test_create_new_user(
     test_cases_service_user_router_for_login_user,
 )
 async def test_login_for_create_task(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        create_test_users: list[dict],
-        user_index: int,
-        expected_status_code: int,
-        expected_result: dict | None,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    create_test_users: list[dict],
+    user_index: int,
+    expected_status_code: int,
+    expected_result: dict | None,
 ) -> None:
     """
     Тест логина /service_user/login.
@@ -151,14 +148,14 @@ async def test_login_for_create_task(
     test_cases_service_user_router_for_change_user,
 )
 async def test_change_user(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        get_user_and_jwt: dict,
-        user_case: int,
-        token: dict,
-        user_update_data: dict,
-        expected_status_code: int,
-        expected_result: dict,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    get_user_and_jwt: dict,
+    user_case: int,
+    token: dict,
+    user_update_data: dict,
+    expected_status_code: int,
+    expected_result: dict,
 ) -> None:
     """
     Тест изменения данных пользователя через /service_user/change_user.
@@ -223,13 +220,13 @@ async def test_change_user(
     test_cases_service_user_router_for_delete_user,
 )
 async def test_delete_user(
-        client: AsyncClient,
-        async_session: AsyncSession,
-        get_user_and_jwt: dict,
-        user_case: int,
-        token: dict,
-        expected_status_code: int,
-        expected_result: str | None,
+    client: AsyncClient,
+    async_session: AsyncSession,
+    get_user_and_jwt: dict,
+    user_case: int,
+    token: dict,
+    expected_status_code: int,
+    expected_result: str | None,
 ) -> None:
     """
      Тест для удаления текущего пользователя через сервисный роутер (/service_user/delete_user).
