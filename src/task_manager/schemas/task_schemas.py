@@ -1,19 +1,9 @@
 """
 Pydantic-схемы (модели) для объектов "задача" (Task).
-
-Этот модуль содержит входные/выходные и вспомогательные модели:
-- TaskBase: базовая модель задачи с общими валидациями;
-- TaskCreate: модель для создания задачи (наследует TaskBase);
-- TaskUpdate: модель для частичного/полного обновления задачи;
-- DbTask: модель представления задачи из БД (ответ).
 """
 
 from typing import Literal
-from pydantic import (
-    BaseModel,
-    Field,
-    ConfigDict
-)
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class TaskBase(BaseModel):
@@ -28,12 +18,13 @@ class TaskBase(BaseModel):
 
     model_config = ConfigDict(extra='forbid') - Запрещает передачу дополнительных полей, не определенных в модели.
     """
+
     title: str = Field(..., min_length=2, max_length=200)
     body: str = Field(..., min_length=2, max_length=200)
     status: Literal["New", "In process", "Finished"] = Field(...)
     user: int = Field(..., ge=1)
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra="forbid")
 
 
 class TaskCreate(TaskBase):
@@ -42,6 +33,7 @@ class TaskCreate(TaskBase):
 
     Наследуется от TaskBase, поэтому содержит те же поля и валидации.
     """
+
     pass
 
 
@@ -57,6 +49,7 @@ class TaskUpdate(BaseModel):
         status (Literal["New", "In process", "Finished"]): Новый статус задачи. Обязательное поле, может принимать одно
         из предопределенных значений.
     """
+
     title: str = Field(default=None, min_length=2, max_length=20)
     body: str = Field(default=None, min_length=20, max_length=200)
     status: Literal["New", "In_process", "Finished"] = Field(...)
@@ -76,6 +69,7 @@ class DbTask(BaseModel):
     class Config:
         from_attributes = True -  Позволяет создавать объекты DbTask из объектов, имеющих атрибуты с такими же именами.
     """
+
     id: int
     title: str
     body: str

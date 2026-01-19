@@ -1,17 +1,17 @@
 """
 Набор тест-кейсов для роутера задач (task router).
-
-Этот модуль содержит параметризованные данные (test cases), которые используются в
-юнит-/интеграционных тестах для проверки эндпоинтов, связанных с задачами.
-Каждый элемент в списках — кортеж, описывающий входные данные и ожидаемое поведение
-API при определённом сценарии.
 """
 
 test_cases_task_router_for_get_task = [
     (
         1,
         200,
-        {"title": f"testtask_1", "body": f"testbody_1_for_testtask1", "status": "New", "user": 1},
+        {
+            "title": "testtask_1",
+            "body": "testbody_1_for_testtask1",
+            "status": "New",
+            "user": 1,
+        },
     ),
     (
         4,
@@ -32,9 +32,20 @@ test_cases_task_router_for_get_task = [
 
 test_cases_task_router_for_add_task = [
     (
-        {"title": "task_for_test", "body": "body for test task", "status": "New", "user": 1},
+        {
+            "title": "task_for_test",
+            "body": "body for test task",
+            "status": "New",
+            "user": 1,
+        },
         200,
-        {"title": "task_for_test", "body": "body for test task", "status": "New", "user": 1, "id": 1},
+        {
+            "title": "task_for_test",
+            "body": "body for test task",
+            "status": "New",
+            "user": 1,
+            "id": 1,
+        },
     ),
     (
         {"body": "body for test task", "status": "New", "user": 1},
@@ -67,12 +78,22 @@ test_cases_task_router_for_add_task = [
         None,
     ),
     (
-        {"title": "task_for_test", "body": "body for test task", "status": "Old", "user": 1},
+        {
+            "title": "task_for_test",
+            "body": "body for test task",
+            "status": "Old",
+            "user": 1,
+        },
         422,
         None,
     ),
     (
-        {"title": "task_for_test", "body": "body for test task", "status": "New", "user": "user"},
+        {
+            "title": "task_for_test",
+            "body": "body for test task",
+            "status": "New",
+            "user": "user",
+        },
         422,
         None,
     ),
@@ -84,7 +105,13 @@ test_cases_task_router_for_update_task = [
         1,
         {"title": "test add task", "body": "test body for test add", "status": "New"},
         200,
-        {"id": 1, "title": "test add task", "body": "test body for test add", "status": "New", "user": 1},
+        {
+            "id": 1,
+            "title": "test add task",
+            "body": "test body for test add",
+            "status": "New",
+            "user": 1,
+        },
     ),
     (
         0,
@@ -112,21 +139,39 @@ test_cases_task_router_for_update_task = [
         1,
         {"body": "test body for test add", "status": "New"},
         200,
-        {"id": 1, "title": "testtask_1", "body": "test body for test add", "status": "New", "user": 1},
+        {
+            "id": 1,
+            "title": "testtask_1",
+            "body": "test body for test add",
+            "status": "New",
+            "user": 1,
+        },
     ),
     (
         0,
         1,
         {"title": "test add task", "status": "New"},
         200,
-        {"id": 1, "title": "test add task", "body": "testbody_1_for_testtask1", "status": "New", "user": 1},
+        {
+            "id": 1,
+            "title": "test add task",
+            "body": "testbody_1_for_testtask1",
+            "status": "New",
+            "user": 1,
+        },
     ),
     (
         0,
         1,
         {"title": "test add task", "body": "test body for test add"},
         422,
-        {"id": 1, "title": "test add task", "body": "test body for test add", "status": "New", "user": 1},
+        {
+            "id": 1,
+            "title": "test add task",
+            "body": "test body for test add",
+            "status": "New",
+            "user": 1,
+        },
     ),
 ]
 

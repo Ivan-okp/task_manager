@@ -1,8 +1,5 @@
 """
 Коллекция маршрутизаторов (APIRouter) приложения.
-
-Этот модуль собирает и экспортирует маршрутизаторы из разных модулей пакета routes.
-Предназначен для удобного импорта и регистрации всех маршрутов в основном приложении FastAPI.
 """
 
 from .task_router import router as router_for_tasks
@@ -14,7 +11,7 @@ __all__ = [
     "router_for_tasks",
     "router_for_users",
     "task_router_for_service",
-    "user_router_for_service"
+    "user_router_for_service",
 ]
 
 """

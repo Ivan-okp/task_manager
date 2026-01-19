@@ -1,23 +1,10 @@
 """
 Экспорт JWT‑зависимостей и утилит для пакета.
-
-Этот модуль собирает и переэкспортирует функции из модуля jwtcore, чтобы предоставить
-единый публичный интерфейс для работы с JWT и зависимостями аутентификации в приложении.
 """
 
-from .jwt_core import (
-    encode_jwt,
-    decode_jwt,
-    get_token,
-    get_current_user
-)
+from .jwt_core import encode_jwt, decode_jwt, get_token, get_current_user
 
-__all__ = [
-    "encode_jwt",
-    "decode_jwt",
-    "get_token",
-    "get_current_user"
-]
+__all__ = ["decode_jwt", "encode_jwt", "get_current_user", "get_token"]
 
 """
 Список всех публичных объектов, экспортируемых из этого модуля.

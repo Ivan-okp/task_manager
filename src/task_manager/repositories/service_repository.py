@@ -1,22 +1,11 @@
 """
 Репозиторий сервисных операций над моделями (асинхронный слой доступа к данным).
-
-Этот модуль содержит класс ServiceRepository с набором classmethod-ов для
-выполнения типичных операций над пользователями и задачами:
-- аутентификация пользователя (login_user),
-- получение списка задач пользователя (get_tasks_by_current_user),
-- получение задачи по id или названию (get_task_by_id_or_title),
-- обновление задачи (update_task).
 """
 
-from typing import List
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.task_manager.models import (
-    UserModel,
-    TaskModel
-)
+from src.task_manager.models import UserModel, TaskModel
 from src.task_manager.schemas import TaskUpdate
 from src.task_manager.logger_core import logger
 
@@ -67,7 +56,7 @@ class ServiceRepository:
         cls,
         user_id: str,
         session: AsyncSession,
-    ) -> List[TaskModel] | List:
+    ) -> list[TaskModel] | list[None]:
         """
         Получает список задач, назначенных указанному пользователю.
 
@@ -79,7 +68,7 @@ class ServiceRepository:
 
         stmt = select(TaskModel).where(TaskModel.user == user_id)
         result = await session.execute(stmt)
-        tasks: List[TaskModel] | List = result.scalars().all()
+        tasks: list[TaskModel] | list = result.scalars().all()
 
         logger.info(f"Found {len(tasks)} tasks for user_id: {user_id}")
         return tasks

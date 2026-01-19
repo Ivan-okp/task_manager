@@ -1,15 +1,7 @@
 """
 API-маршруты для управления пользователями.
-
-Этот модуль содержит FastAPI APIRouter с CRUD-эндпоинтами для сущности User.
-Каждый эндпоинт использует асинхронную сессию SQLAlchemy через Depends(getdb)
-и делегирует операции над данными в слой репозиториев (UserRepository).
 """
 
-from typing import (
-    List,
-    Dict
-)
 from fastapi import (
     APIRouter,
     HTTPException,
@@ -20,11 +12,7 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.database_core.database import get_db
 from src.task_manager.repositories import UserRepository
-from src.task_manager.schemas import (
-    DbUser,
-    UserCreate,
-    UserUpdate
-)
+from src.task_manager.schemas import DbUser, UserCreate, UserUpdate
 from src.task_manager.logger_core import logger
 
 router = APIRouter(
@@ -34,9 +22,11 @@ router = APIRouter(
 
 
 @router.get(
-    "", summary="Получить список всех пользователей", response_model=List[DbUser]
+    "", summary="Получить список всех пользователей", response_model=list[DbUser]
 )
-async def get_users(session: AsyncSession = Depends(get_db)) -> List[DbUser | None]:
+async def get_users(
+    session: AsyncSession = Depends(get_db),
+) -> list[DbUser] | list[None]:
     """
     Получает список всех пользователей.
 
@@ -141,7 +131,10 @@ async def update_user(
     raise HTTPException(status_code=404, detail="User is not exist")
 
 
-@router.delete("/{user_id}", summary="Удалить пользователя")
+@router.delete(
+    "/{user_id}",
+    summary="Удалить пользователя",
+)
 async def delete_user(
     user_id: int, session: AsyncSession = Depends(get_db)
 ) -> Response:

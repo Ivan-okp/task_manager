@@ -1,15 +1,8 @@
 """
 Модуль модели пользователя (UserModel) для SQLAlchemy.
-
-Содержит декларативную модель UserModel, которая описывает таблицу пользователей
-в базе данных и связанное с ней ORM-отношение к задачам пользователя.
 """
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    String
-)
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from src.task_manager.database_core.database import Base
 
@@ -26,6 +19,7 @@ class UserModel(Base):
     - tasks: ORM-отношение к задачам пользователя (список TaskModel), двунаправленное
       через backpopulates="author" в TaskModel.
     """
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)

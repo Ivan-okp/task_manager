@@ -1,20 +1,12 @@
 """
 Репозиторий операций над сущностью User — асинхронный слой доступа к данным.
-
-Модуль предоставляет CRUD-операции для модели UserModel с использованием
-AsyncSession SQLAlchemy. Методы бросают HTTPException для простоты интеграции
-с FastAPI-эндпоинтами.
 """
 
-from typing import List
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.models import UserModel
-from src.task_manager.schemas import (
-    UserCreate,
-    UserUpdate
-)
+from src.task_manager.schemas import UserCreate, UserUpdate
 from src.task_manager.logger_core import logger
 
 
@@ -30,7 +22,7 @@ class UserRepository:
     async def get_all(
         cls,
         session: AsyncSession,
-    ) -> List[UserModel] | List:
+    ) -> list[UserModel] | list[None]:
         """
         Получает список всех пользователей из базы данных.
 

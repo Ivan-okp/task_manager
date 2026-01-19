@@ -1,30 +1,12 @@
 """
 API-маршруты для работы с задачами (Task).
-
-Этот модуль содержит FastAPI-роутер с CRUD-эндпоинтами для сущности Task.
-Каждая операция использует асинхронную сессию SQLAlchemy через Depends(get_db)
-и репозиторий TaskRepository для доступа к данным.
 """
 
-from typing import (
-    List,
-    Dict
-)
-from fastapi import (
-    APIRouter,
-    HTTPException,
-    Depends,
-    Response,
-    status
-)
+from fastapi import APIRouter, HTTPException, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.database_core.database import get_db
 from src.task_manager.repositories import TaskRepository
-from src.task_manager.schemas import (
-    DbTask,
-    TaskCreate,
-    TaskUpdate
-)
+from src.task_manager.schemas import DbTask, TaskCreate, TaskUpdate
 from src.task_manager.logger_core import logger
 
 router = APIRouter(
@@ -33,8 +15,10 @@ router = APIRouter(
 )
 
 
-@router.get("", summary="Получить список всех задач", response_model=List[DbTask])
-async def get_tasks(session: AsyncSession = Depends(get_db)) -> List[DbTask] | List:
+@router.get("", summary="Получить список всех задач", response_model=list[DbTask])
+async def get_tasks(
+    session: AsyncSession = Depends(get_db),
+) -> list[DbTask] | list[None]:
     """
     Получает список всех задач.
 
@@ -137,7 +121,10 @@ async def update_task(
     raise HTTPException(status_code=404, detail="Task is not exist")
 
 
-@router.delete("/{task_id}", summary="Удалить задачу")
+@router.delete(
+    "/{task_id}",
+    summary="Удалить задачу",
+)
 async def delete_task(
     task_id: int,
     session: AsyncSession = Depends(get_db),

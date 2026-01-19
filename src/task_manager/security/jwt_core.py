@@ -1,22 +1,11 @@
 """
 JWT‑утилиты и зависимости FastAPI для аутентификации пользователей.
-
-Этот модуль предоставляет:
-- создание (encodejwt) и разбор (decodejwt) JWT токенов;
-- dependency gettoken — извлекает и декодирует токен из заголовка Authorization;
-- dependency getcurrentuser — получает текущего пользователя из БД по payload токена.
 """
 
-from datetime import (
-    timedelta,
-    datetime,
-    timezone
-)
+from datetime import timedelta, datetime, UTC
+
 import jwt
-from fastapi import (
-    Depends,
-    HTTPException
-)
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,7 +26,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10")
 
 
 async def encode_jwt(
-    payload: dict,
+    payload: dict[str, str],
     algorithm: str = ALGORITHM,
     expire_timedelta: timedelta | None = None,
     expire_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -56,7 +45,7 @@ async def encode_jwt(
     logger.info(f"Creating JWT with payload: {payload.get('sub')}")
 
     to_encode = payload.copy()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if expire_timedelta:
         expire = now + expire_timedelta
     else:
@@ -72,7 +61,7 @@ async def encode_jwt(
 
 async def decode_jwt(
     access_token: str | bytes, algorithm: str = ALGORITHM, secret_key: str = SECRET_KEY
-) -> dict:
+) -> dict[str, str]:
     """
     Декодирует и верифицирует JWT.
 
@@ -100,7 +89,7 @@ async def decode_jwt(
 
 async def get_token(
     token: str = Depends(oauth2_scheme),
-) -> dict:
+) -> dict[str, str | int]:
     """
     FastAPI dependency: извлекает токен из заголовка Authorization и возвращает декодированный payload.
 

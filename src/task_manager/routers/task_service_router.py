@@ -1,39 +1,16 @@
 """
 API-эндпоинты сервиса работы с задачами текущего аутентифицированного пользователя.
-
-Модуль предоставляет набор маршрутов (FastAPI APIRouter) для операций, которые
-относятся к задачам конкретного пользователя: получение всех задач пользователя,
-чтение конкретной задачи по id или title, создание и обновление задач.
 """
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    Form,
-    HTTPException,
-    Query,
-    status,
-    Response
-)
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.database_core.database import get_db
-from src.task_manager.repositories import (
-    TaskRepository,
-    ServiceRepository
-)
-from src.task_manager.schemas import (
-    TaskUpdate,
-    TaskStatus,
-    TaskCreateService,
-    DbTask
-)
+from src.task_manager.repositories import TaskRepository, ServiceRepository
+from src.task_manager.schemas import TaskUpdate, TaskStatus, TaskCreateService, DbTask
 from src.task_manager.security import get_current_user
-from typing import (
-    List,
-    Dict
-)
 
 from src.task_manager.logger_core import logger
+from src.task_manager.models import UserModel
 
 router = APIRouter(
     prefix="/service",
@@ -42,11 +19,11 @@ router = APIRouter(
 
 
 @router.get(
-    "/get_all_tasks", summary="Список задач пользователя", response_model=List[DbTask]
+    "/get_all_tasks", summary="Список задач пользователя", response_model=list[DbTask]
 )
 async def get_all_tasks(
-    user=Depends(get_current_user), session: AsyncSession = Depends(get_db)
-) -> List[DbTask] | List:
+    user: UserModel = Depends(get_current_user), session: AsyncSession = Depends(get_db)
+) -> list[DbTask] | list[None]:
     """
     Получает список всех задач, принадлежащих текущему пользователю.
 
@@ -66,14 +43,16 @@ async def get_all_tasks(
 
 
 @router.get(
-    "/get_specific_task", summary="Прочесть конкретную задачу", response_model=DbTask
+    "/get_specific_task",
+    summary="Прочесть конкретную задачу",
+    response_model=DbTask,
 )
 async def get_specific_task(
     task_id: int | str | None = Query(default=None, description="ID задачи для чтения"),
     task_title: str | None = Query(
         default=None, description="Название задачи для чтения"
     ),
-    user=Depends(get_current_user),
+    user: UserModel = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> DbTask:
     """
@@ -141,7 +120,7 @@ async def create_task(
     title: str = Form(...),
     body: str = Form(...),
     status: TaskStatus = Form(...),
-    user=Depends(get_current_user),
+    user: UserModel = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> DbTask:
     """
@@ -186,9 +165,9 @@ async def create_task(
 )
 async def update_task(
     task_for_update: TaskUpdate,
-    task_id: int = None,
-    task_title: str = None,
-    user=Depends(get_current_user),
+    task_id: int | None = None,
+    task_title: str | None = None,
+    user: UserModel = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> DbTask:
     """
@@ -239,11 +218,14 @@ async def update_task(
         raise HTTPException(status_code=400, detail="Incorrect request")
 
 
-@router.delete("/delete_task", summary="Удалить задачу", response_model=Dict[str, str])
+@router.delete(
+    "/delete_task",
+    summary="Удалить задачу",
+)
 async def delete_task(
-    task_id: int = None,
-    task_title: str = None,
-    user=Depends(get_current_user),
+    task_id: int | None = None,
+    task_title: str | None = None,
+    user: UserModel = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> Response:
     """

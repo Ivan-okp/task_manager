@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:8000"
+    env_file: .env
+    environment:
+      # Это значение ПЕРЕКРОЕТ localhost из .env файла
+      - POSTGRES_HOST=db
+    depends_on:
+      - db
+    # Исправлено: ждем 'db', так как это имя сервиса в сети Docker
+    command: >
+      bash -c "while ! </dev/tcp/db/5432; do sleep 1; done;
+      uvicorn src.task_manager.main:app --host 0.0.0.0 --port 8000"
+
+  db:
+    image: postgres:17-alpine # 17 версия — самая стабильная на начало 2026 года
+    env_file: .env
+    # Здесь POSTGRES_HOST не нужен, базе нужны только USER, PASSWORD и NAME
+    environment:
+      - POSTGRES_DB=${POSTGRES_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
