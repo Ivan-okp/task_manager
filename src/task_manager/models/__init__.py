@@ -1,17 +1,11 @@
 """
 Этот модуль предоставляет доступ к моделям данных для пользователей и задач.
-
-Он импортирует модели 'UserModel' и 'TaskModel' из соответствующих файлов
-и делает их доступными для импорта из этого модуля.
 """
 
 from .user_models import UserModel
 from .task_models import TaskModel
 
-__all__ = [
-    "UserModel",
-    "TaskModel"
-]
+__all__ = ["TaskModel", "UserModel"]
 
 """
 Список всех публичных объектов, экспортируемых из этого модуля.

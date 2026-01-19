@@ -1,24 +1,9 @@
 """
 Тесты для service-роутера пользователей (закрытые эндпоинты, требующие аутентификации).
-
-Этот модуль содержит интеграционные тесты, проверяющие поведение эндпоинтов под
-пространством имён service_user, а именно:
-- создание нового пользователя через /service_user/create_user;
-- вход (логин) через /service_user/login;
-- изменение данных пользователя через /service_user/change_user;
-- удаление пользователя через /service_user/delete_user.
 """
 
-from typing import (
-    List,
-    Dict
-)
-
 import pytest
-from httpx import (
-    AsyncClient,
-    Response
-)
+from httpx import AsyncClient, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,7 +14,7 @@ from tests.test_cases import (
     test_cases_service_user_router_for_create_new_user,
     test_cases_service_user_router_for_login_user,
     test_cases_service_user_router_for_change_user,
-    test_cases_service_user_router_for_delete_user
+    test_cases_service_user_router_for_delete_user,
 )
 
 
@@ -103,11 +88,11 @@ async def test_create_new_user(
 async def test_login_for_create_task(
     client: AsyncClient,
     async_session: AsyncSession,
-    create_test_users: List[Dict],
+    create_test_users: list[dict],
     user_index: int,
     expected_status_code: int,
     expected_result: dict | None,
-):
+) -> None:
     """
     Тест логина /service_user/login.
 
@@ -171,7 +156,7 @@ async def test_change_user(
     user_update_data: dict,
     expected_status_code: int,
     expected_result: dict,
-):
+) -> None:
     """
     Тест изменения данных пользователя через /service_user/change_user.
 
@@ -242,7 +227,7 @@ async def test_delete_user(
     token: dict,
     expected_status_code: int,
     expected_result: str | None,
-):
+) -> None:
     """
      Тест для удаления текущего пользователя через сервисный роутер (/service_user/delete_user).
 

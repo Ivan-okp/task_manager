@@ -1,21 +1,12 @@
 """
 Репозиторий операций над сущностью Task — асинхронный слой доступа к данным.
-
-В этом модуле собраны CRUD-операции для моделей Task и связанные проверки
-(наличие пользователя, валидация входных данных и т.п.). Методы реализованы
-как classmethod, принимают AsyncSession и бросают HTTPException для удобной
-интеграции с FastAPI-эндпоинтами.
 """
 
-from typing import List
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.models import TaskModel, UserModel
-from src.task_manager.schemas import (
-    TaskCreate,
-    TaskUpdate
-)
+from src.task_manager.schemas import TaskCreate, TaskUpdate
 from src.task_manager.logger_core import logger
 
 
@@ -31,7 +22,7 @@ class TaskRepository:
     async def get_all(
         cls,
         session: AsyncSession,
-    ) -> List[TaskModel] | List:
+    ) -> list[TaskModel] | list[None]:
         """
         Получает список всех задач из базы данных.
 

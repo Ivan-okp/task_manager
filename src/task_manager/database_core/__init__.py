@@ -1,23 +1,10 @@
 """
 Этот модуль предоставляет доступ к компонентам базы данных.
-
-Он импортирует объекты из модуля 'database', такие, как базовый класс для моделей,
-асинхронный движок, фабрику асинхронных сессий и функцию для получения сессии.
 """
 
-from .database import (
-    Base,
-    async_engine,
-    async_session_local,
-    get_db
-)
+from .database import Base, async_engine, async_session_local, get_db
 
-__all__ = [
-    "Base",
-    "async_engine",
-    "async_session_local",
-    "get_db"
-]
+__all__ = ["Base", "async_engine", "async_session_local", "get_db"]
 
 """
 Список всех публичных объектов, экспортируемых из этого модуля.

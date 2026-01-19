@@ -1,25 +1,9 @@
 """
 Тесты для сервисного роутера задач (service).
-
-Этот модуль содержит параметризованные интеграционные тесты, которые проверяют
-поведение закрытых (требующих аутентификации) сервисных эндпоинтов:
-- получение всех задач пользователя (/service/get_all_tasks);
-- получение конкретной задачи по id или title (/service/get_specific_task);
-- создание задачи (/service/create_task);
-- обновление задачи (update_task);
-- удаление задачи (delete_task).
 """
 
-from typing import (
-    List,
-    Dict
-)
-
 import pytest
-from httpx import (
-    AsyncClient,
-    Response
-)
+from httpx import AsyncClient, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,7 +15,7 @@ from tests.test_cases import (
     test_cases_service_task_router_for_get_specific_task,
     test_cases_service_task_router_for_create_task,
     test_cases_service_task_router_for_update_task,
-    test_cases_service_task_router_for_delete_task
+    test_cases_service_task_router_for_delete_task,
 )
 
 
@@ -47,8 +31,8 @@ async def test_get_all_tasks(
     token: dict,
     expected_status_code: int,
     expected_result: dict | None,
-    create_test_tasks: List[Dict],
-):
+    create_test_tasks: list[dict],
+) -> None:
     """
     Проверяет, что GET /tasks возвращает список задач конкретного пользователя,
     и что каждая задача соответствует созданным тестовым задачам.
@@ -110,8 +94,8 @@ async def test_get_specific_task(
     task_title: str,
     expected_status_code: int,
     expected_result: dict | None,
-    create_test_tasks: List[Dict],
-):
+    create_test_tasks: list[dict],
+) -> None:
     """
     Тест для /service/get_specific_task — проверяет поиск задачи конкретного пользователя по id и по title.
 
@@ -185,13 +169,13 @@ async def test_get_specific_task(
 async def test_create_task(
     client: AsyncClient,
     async_session: AsyncSession,
-    get_user_and_jwt,
+    get_user_and_jwt: dict[str, dict | str],
     task_case: int,
     token: dict,
     task_data: dict,
     expected_status_code: int,
     expected_result: dict,
-):
+) -> None:
     """
     Тест для /service/create_task — создание задачи от имени аутентифицированного пользователя.
 
@@ -260,7 +244,7 @@ async def test_create_task(
 async def test_update_task(
     client: AsyncClient,
     async_session: AsyncSession,
-    create_test_tasks: List[Dict],
+    create_test_tasks: list[dict],
     get_user_and_jwt: dict,
     task_case: int,
     task_case_2: int,
@@ -270,7 +254,7 @@ async def test_update_task(
     task_title: str,
     expected_status_code: int,
     expected_result: dict | None,
-):
+) -> None:
     """
     Тест для /service/update_task — изменение задачи от имени аутентифицированного пользователя.
 
@@ -381,7 +365,7 @@ async def test_delete_task(
     client: AsyncClient,
     async_session: AsyncSession,
     get_user_and_jwt: dict,
-    create_test_tasks: List[Dict],
+    create_test_tasks: list[dict],
     task_case: int,
     task_case_2: int,
     token: dict,
@@ -390,7 +374,7 @@ async def test_delete_task(
     expected_status_code: int,
     expected_result: dict,
     expected_result_2: dict,
-):
+) -> None:
     """
     Интеграционный тест для /service/deletetask, проверяющий удаление задач, принадлежащих конкретному пользователю,
     по id и по title.

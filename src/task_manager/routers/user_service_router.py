@@ -1,40 +1,17 @@
 """
 Маршруты сервиса для работы с учетной записью пользователя.
-
-Этот модуль предоставляет набор API-эндпоинтов (FastAPI APIRouter) для:
-- создания новой учетной записи (createnewuser),
-- аутентификации и выдачи JWT для работы с задачами (loginforcreatetask),
-- изменения данных текущего пользователя (changeuser),
-- удаления текущей учетной записи (deletecurrentuser).
 """
 
-from fastapi import (
-    APIRouter,
-    Form,
-    Depends,
-    HTTPException,
-    status,
-    Response
-)
+from fastapi import APIRouter, Form, Depends, HTTPException, status, Response
+from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.task_manager.database_core.database import get_db
-from src.task_manager.repositories import (
-    UserRepository,
-    ServiceRepository
-)
-from src.task_manager.schemas import (
-    DbUser,
-    UserCreate,
-    TokenInfo,
-    UserUpdate
-)
-from src.task_manager.security import (
-    encode_jwt,
-    get_current_user
-)
-from typing import Dict
+from src.task_manager.repositories import UserRepository, ServiceRepository
+from src.task_manager.schemas import DbUser, UserCreate, TokenInfo, UserUpdate
+from src.task_manager.security import encode_jwt, get_current_user
 
 from src.task_manager.logger_core import logger
+from src.task_manager.models import UserModel
 
 router = APIRouter(prefix="/service_user", tags=["Сервис (работа с учетной записью)"])
 
@@ -42,9 +19,9 @@ router = APIRouter(prefix="/service_user", tags=["Сервис (работа с 
 @router.post("/create_user", summary="Создание учетной записи", response_model=DbUser)
 async def create_new_user(
     session: AsyncSession = Depends(get_db),
-    name=Form(...),
-    email=Form(...),
-    password=Form(...),
+    name: str | None = Form(...),
+    email: str | EmailStr = Form(...),
+    password: str | None = Form(...),
 ) -> DbUser:
     """
     Создать нового пользователя.
@@ -78,8 +55,8 @@ async def create_new_user(
 )
 async def login_for_create_task(
     session: AsyncSession = Depends(get_db),
-    username: str = Form(...),
-    password: str = Form(...),
+    username: str | None = Form(...),
+    password: str | None = Form(...),
 ) -> TokenInfo:
     """
     Выполнить аутентификацию пользователя и вернуть JWT.
@@ -99,7 +76,7 @@ async def login_for_create_task(
     if user_for_encode is None:
         raise HTTPException(status_code=404, detail="User not found")
     jwt_payload = {"sub": str(user_for_encode.id), "username": user_for_encode.name}
-    token = await encode_jwt(jwt_payload)
+    token = await encode_jwt(payload=jwt_payload)
     logger.info(
         f"API Response: User '{username}' (ID: {user_for_encode.id}) successfully logged in. JWT issued."
     )
@@ -110,10 +87,10 @@ async def login_for_create_task(
 @router.put("/change_user", summary="Изменение учетной записи", response_model=DbUser)
 async def change_user(
     session: AsyncSession = Depends(get_db),
-    name=Form(...),
-    email=Form(...),
-    password=Form(...),
-    user=Depends(get_current_user),
+    name: str | None = Form(...),
+    email: EmailStr | str = Form(...),
+    password: str | None = Form(...),
+    user: UserModel = Depends(get_current_user),
 ) -> DbUser:
     """
     Обновить данные текущего пользователя.
@@ -139,11 +116,12 @@ async def change_user(
 
 
 @router.delete(
-    "/delete_user", summary="Удалить учетную запись", response_model=Dict[str, str]
+    "/delete_user",
+    summary="Удалить учетную запись",
 )
 async def delete_current_user(
     session: AsyncSession = Depends(get_db),
-    user=Depends(get_current_user),
+    user: UserModel = Depends(get_current_user),
 ) -> Response:
     """
     Удалить учетную запись текущего пользователя.
@@ -162,4 +140,3 @@ async def delete_current_user(
 
     logger.info(f"Successfully deleted user with ID: {user.id}")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
